@@ -15,7 +15,7 @@ let
               mapAttrs
                 (name: component:
                   # if already a component, then pass it through (this is mainly for aggregating components from other flakes)
-                  if component ? key && lib.hasInfix "components" component.key
+                  if component ? key #&& lib.hasInfix "components" component.key
                   then builtins.trace "already component" {
                     imports = [ component ];
                   }
