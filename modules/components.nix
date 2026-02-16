@@ -16,7 +16,9 @@ let
                 (name: component:
                   # if already a component, then pass it through (this is mainly for aggregating components from other flakes)
                   if component ? key && lib.hasInfix "components" component.key
-                  then builtins.trace "already component" component
+                  then builtins.trace "already component" {
+                    inherit (component) key imports _class _file;
+                  }
                   # otherwise assume it's a module and wrap it in a component
                   else {
                     key = "${config.flake.meta.flakeref}#components.${domain}.${subdomain}.${name}";
