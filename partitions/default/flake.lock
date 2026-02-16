@@ -18,23 +18,19 @@
         "type": "github"
       }
     },
-    "nixology": {
+    "main": {
       "inputs": {
         "flake-parts": "flake-parts"
       },
       "locked": {
-        "lastModified": 1770056827,
-        "narHash": "sha256-T5O9nnzNe5wVA7vK789FpIqkj5TDqIgt9WGaSMbj+Po=",
-        "ref": "refs/heads/main",
-        "rev": "1ee72d844d7e536741f4520851c6f6f71a2068f4",
-        "revCount": 1,
-        "type": "git",
-        "url": "ssh://git@github.com/marksisson/nixology"
+        "path": "../..",
+        "type": "path"
       },
       "original": {
-        "type": "git",
-        "url": "ssh://git@github.com/marksisson/nixology"
-      }
+        "path": "../..",
+        "type": "path"
+      },
+      "parent": []
     },
     "nixpkgs": {
       "locked": {
@@ -85,16 +81,16 @@
     "pkgs": {
       "inputs": {
         "nixology": [
-          "nixology"
+          "main"
         ],
         "nixpkgs": "nixpkgs",
         "nixpkgs-unstable": "nixpkgs-unstable"
       },
       "locked": {
-        "lastModified": 1770051562,
-        "narHash": "sha256-j7etNdeJcVMUKbZhAsoz1YcOBKTwcUvd9KpUEvccTp8=",
+        "lastModified": 1770776762,
+        "narHash": "sha256-vXAU4q5jeqMSpgCo1UbcxJElwxLADUZs7RyqHZlG4WM=",
         "ref": "refs/heads/main",
-        "rev": "a3273bc36738047e70bfe20ed1f59aad6692301a",
+        "rev": "2b6631157969ebd9dbbe5a7c985b155a472d2ff4",
         "revCount": 1,
         "type": "git",
         "url": "ssh://git@github.com/marksisson/pkgs"
@@ -106,7 +102,7 @@
     },
     "root": {
       "inputs": {
-        "nixology": "nixology",
+        "main": "main",
         "pkgs": "pkgs",
         "systems": "systems",
         "systems-darwin": "systems-darwin",

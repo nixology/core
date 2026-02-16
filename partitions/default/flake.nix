@@ -6,13 +6,12 @@
 
   inputs = {
     # used for locking and following dependencies; do not access from parent flake
-    #main.url = "path:../..";
-    nixology.url = "git+ssh://git@github.com/marksisson/nixology";
+    main.url = "path:../..";
 
     # defaults
     pkgs = {
       url = "git+ssh://git@github.com/marksisson/pkgs";
-      inputs.nixology.follows = "nixology";
+      inputs.nixology.follows = "main";
     };
 
     systems.url = "github:nix-systems/default";
