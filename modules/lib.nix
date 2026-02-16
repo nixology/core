@@ -6,7 +6,6 @@ let
       # so that is is part of the component
   inputs = config.partitions.default.extraInputs;
 
-  /*
   builtinModule =
     let
     in
@@ -16,11 +15,11 @@ let
       systems = lib.mkDefault (import inputs.systems);
 
       # default pkgs
-      #perSystem = { system, ... }: {
-      #  _module.args.pkgs = lib.mkDefault (builtins.seq inputs.nixpkgs inputs.nixpkgs.legacyPackages.${system});
-      #};
+      perSystem = { system, ... }: {
+        _module.args.pkgs = lib.mkDefault (builtins.seq inputs.nixpkgs inputs.nixpkgs.legacyPackages.${system});
+      };
     };
-*/
+
   module = let
   in
     { lib, ... }:
@@ -35,8 +34,8 @@ let
               module = {
                 imports = [
                   flakeModule
-                  inputs.pkgs.components.nixology.pkgs.nixpkgs
-                #builtinModule
+                  #inputs.pkgs.components.nixology.pkgs.nixpkgs
+                  builtinModule
                 ];
               };
             in
