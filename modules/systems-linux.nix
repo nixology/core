@@ -5,7 +5,7 @@ let
   inputs = config.partitions.default.extraInputs;
 
   module = {
-    systems = lib.mkDefault (import inputs.systems);
+    systems = lib.mkDefault (import inputs.systems-linux);
   };
 
   component = {
@@ -13,6 +13,5 @@ let
   };
 in
 {
-  imports = [ module ];
-  flake.components.nixology.std.systems = component;
+  flake.components.nixology.std.systems-linux = component;
 }

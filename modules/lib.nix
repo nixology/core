@@ -1,9 +1,8 @@
-main@{ config, inputs, ... }:
+main@{ config ? null, inputs, lib ? inputs.flake-parts.inputs.nixpkgs-lib.lib, ... }:
 let
   flake-parts-lib = main.inputs.flake-parts.lib;
 
   defaultModule =
-    { lib, ... }:
     let
       inputs = config.partitions.default.extraInputs;
     in
@@ -21,72 +20,61 @@ let
         };
     };
 
-  module =
-    { lib, ... }:
+  library =
     let
-      library =
+      mkFlake = flakeArgs@{ flakeref, ... }: flakeModule:
         let
-          mkFlake =
-            flakeArgs@{ flakeref, ... }:
-            flakeModule:
-            let
-              args = builtins.removeAttrs flakeArgs [ "flakeref" ];
-              module = {
-                imports = [
-                  flakeModule
-                  defaultModule
-                ];
-              };
-            in
-            flake-parts-lib.mkFlake args {
-              imports = [
-                module
-                { flake.meta.flakeref = flakeref; }
-              ];
-            };
-
-          mkTOMLFlake =
-            flakeArgs: tomlFile:
-            let
-              toml = builtins.fromTOML (builtins.readFile tomlFile);
-              args = flakeArgs // {
-                inherit (toml.flake) flakeref;
-              };
-              source = lib.lists.head toml.sources;
-              name = lib.lists.last (lib.strings.split "/" source.url);
-              component = lib.lists.head source.components;
-              input = "${name}.components.${component}";
-              module = lib.getAttrFromPath (lib.strings.splitString "." input) flakeArgs.inputs;
-            in
-            mkFlake args module;
-
-          modulesIn =
-            directory:
-            with lib;
-            let
-              moduleFiles =
-                if filesystem.pathIsDirectory directory then
-                  (filter (n: strings.hasSuffix ".nix" n) (filesystem.listFilesRecursive directory))
-                else
-                  [ ];
-            in
-            moduleFiles;
+          args = builtins.removeAttrs flakeArgs [ "flakeref" ];
+          module = {
+            imports = [
+              flakeModule
+              (lib.mkIf (config != null) defaultModule)
+            ];
+          };
         in
-        {
-          inherit mkFlake mkTOMLFlake modulesIn;
+        flake-parts-lib.mkFlake args {
+          imports = [
+            module
+            { flake.meta.flakeref = flakeref; }
+          ];
         };
+
+      mkTOMLFlake = flakeArgs: tomlFile:
+        let
+          toml = builtins.fromTOML (builtins.readFile tomlFile);
+          args = flakeArgs // {
+            inherit (toml.flake) flakeref;
+          };
+          source = lib.lists.head toml.sources;
+          name = lib.lists.last (lib.strings.split "/" source.url);
+          component = lib.lists.head source.components;
+          input = "${name}.components.${component}";
+          module = lib.getAttrFromPath (lib.strings.splitString "." input) flakeArgs.inputs;
+        in
+        mkFlake args module;
+
+      modulesIn = directory: with lib; let
+        moduleFiles =
+          if filesystem.pathIsDirectory directory then
+            (filter (n: strings.hasSuffix ".nix" n) (filesystem.listFilesRecursive directory))
+          else
+            [ ];
+      in
+      moduleFiles;
     in
     {
-      options =
-        with lib;
-        with types;
-        {
-          flake.lib = mkOption {
-            type = attrsOf (functionTo anything);
-            default = { };
-            description = "A set of utility functions and definitions.";
-          };
+      inherit mkFlake mkTOMLFlake modulesIn;
+    };
+
+  module = { lib, ... }:
+    {
+      options = with lib; with types; {
+        flake.lib = mkOption {
+          type = attrsOf (functionTo anything);
+          default = { };
+          description = "A set of utility functions and definitions.";
         };
+      };
 
       config.flake.lib = lib.mkDefault library;
     };
@@ -96,6 +84,7 @@ let
   };
 in
 {
+  flake.lib = library; # this is for lib access when imported directly (i.e. in this flake)
   imports = [ module ];
   flake.components.nixology.std.lib = component;
 }

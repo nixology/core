@@ -1,7 +1,4 @@
-{
-  inputs,
-  ...
-}:
+{ inputs, ... }:
 let
   default =
     let
@@ -11,21 +8,17 @@ let
       imports = [ inputs.flake-parts.flakeModules.partitions ];
       partitions.${partition} = {
         extraInputsFlake = ../partitions/${partition};
-        module =
-          { inputs, lib, ... }:
-          {
-            # default systems
-            systems = lib.mkDefault (import inputs.systems);
+        module = { inputs, lib, ... }: {
+          # default systems
+          systems = lib.mkDefault (import inputs.systems);
 
-            # default pkgs
-            perSystem =
-              { lib, system, ... }:
-              {
-                _module.args.pkgs = lib.mkDefault (
-                  builtins.seq inputs.nixpkgs inputs.nixpkgs.legacyPackages.${system}
-                );
-              };
+          # default pkgs
+          perSystem = { lib, system, ... }: {
+            _module.args.pkgs = lib.mkDefault (
+              builtins.seq inputs.nixpkgs inputs.nixpkgs.legacyPackages.${system}
+            );
           };
+        };
       };
     };
 
