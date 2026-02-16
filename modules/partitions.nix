@@ -1,7 +1,5 @@
 {
-  config,
   inputs,
-  lib,
   ...
 }:
 let
@@ -11,20 +9,18 @@ let
     in
     {
       imports = [ inputs.flake-parts.flakeModules.partitions ];
-      partitions.${partition} =
-        let
-          inputs = config.partitions.${partition}.extraInputs;
-        in
-        {
-          extraInputsFlake = ../partitions/${partition};
-          module = {
+      partitions.${partition} = {
+        extraInputsFlake = ../partitions/${partition};
+        module =
+          { inputs, lib, ... }:
+          {
             # default systems
             systems = lib.mkDefault (import inputs.systems);
 
             # default pkgs
             imports = [ inputs.pkgs.components.nixology.pkgs.nixpkgs ];
           };
-        };
+      };
     };
 
   module = default;

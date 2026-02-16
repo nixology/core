@@ -9,10 +9,10 @@
     main.url = "path:../..";
 
     # defaults
-    pkgs = {
-      url = "git+ssh://git@github.com/marksisson/pkgs";
-      inputs.nixology.follows = "main";
-    };
+    nixpkgs.url = "github:nixos/nixpkgs";
+    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    nixpkgs-unfree.url = "github:numtide/nixpkgs-unfree/nixpkgs-unstable";
+    nixpkgs-unfree.inputs.nixpkgs.follows = "nixpkgs-unstable";
 
     systems.url = "github:nix-systems/default";
     systems-darwin.url = "github:nix-systems/default-darwin";
