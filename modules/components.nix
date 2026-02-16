@@ -14,7 +14,11 @@ let
             (subdomain: components:
               mapAttrs
                 (name: component:
-                  {
+                  # if already a component, then pass it through (this is mainly for aggregating components from other flakes)
+                  if component ? key && lib.hasInfix "#components" component.key
+                  then component
+                  # otherwise assume it's a module and wrap it in a component
+                  else {
                     key = "${config.flake.meta.flakeref}#components.${domain}.${subdomain}.${name}";
                     imports = [ component.module ] ++ component.dependencies;
                     _class = "flake";
