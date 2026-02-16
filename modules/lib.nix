@@ -2,26 +2,6 @@ main@{ config, inputs, ... }:
 let
   flake-parts-lib = main.inputs.flake-parts.lib;
 
-  # capture partition inputs from config of outer flake
-  # so that is is part of the component
-  inputs = config.partitions.default.extraInputs;
-
-  defaultModule =
-    { lib, ... }:
-    {
-      # default systems
-      systems = lib.mkDefault (import inputs.systems);
-
-      # default pkgs
-      perSystem =
-        { system, ... }:
-        {
-          _module.args.pkgs = lib.mkDefault (
-            builtins.seq inputs.nixpkgs inputs.nixpkgs.legacyPackages.${system}
-          );
-        };
-    };
-
   module =
     { lib, ... }:
     let
@@ -35,7 +15,7 @@ let
               module = {
                 imports = [
                   flakeModule
-                  defaultModule
+                  config.partitions.default.module
                 ];
               };
             in
