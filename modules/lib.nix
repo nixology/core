@@ -2,6 +2,24 @@ main@{ config, inputs, ... }:
 let
   flake-parts-lib = main.inputs.flake-parts.lib;
 
+  defaultModule =
+    let
+      inputs = config.partitions.default.extraInputs;
+    in
+    {
+      # default systems
+      systems = lib.mkDefault (import inputs.systems);
+
+      # default pkgs
+      perSystem =
+        { lib, system, ... }:
+        {
+          _module.args.pkgs = lib.mkDefault (
+            builtins.seq inputs.nixpkgs inputs.nixpkgs.legacyPackages.${system}
+          );
+        };
+    };
+
   module =
     { lib, ... }:
     let
@@ -15,7 +33,7 @@ let
               module = {
                 imports = [
                   flakeModule
-                  config.partitions.default.module
+                  defaultModule
                 ];
               };
             in
