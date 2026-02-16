@@ -9,27 +9,15 @@ let
 
         description = "A set of reusable components.";
 
-        apply = mapAttrs (domain: subdomains:
-          mapAttrs
-            (subdomain: components:
-              mapAttrs
-                (name: component:
-                  # if already a component, then pass it through (this is mainly for aggregating components from other flakes)
-                  if component ? key #&& lib.hasInfix "components" component.key
-                  then builtins.trace "already component" {
-                    imports = [ component ];
-                  }
-                  # otherwise assume it's a module and wrap it in a component
-                  else builtins.trace "not a component" {
-                    key = "${config.flake.meta.flakeref}#components.${domain}.${subdomain}.${name}";
-                    imports = [ component.module ] ++ component.dependencies;
-                    _class = "flake";
-                    _file = "${moduleLocation}#components.${domain}.${subdomain}.${name}";
-                  })
-                components
-            )
-            subdomains
-        );
+        # convert components to modules
+        apply = mapAttrs (domain: mapAttrs (subdomain: mapAttrs (name: component:
+          {
+            key = "${config.flake.meta.flakeref}#components.${domain}.${subdomain}.${name}";
+            imports = [ component.module ] ++ component.dependencies;
+            _class = "flake";
+            _file = "${moduleLocation}#components.${domain}.${subdomain}.${name}";
+          }
+        )));
       };
 
       component = submodule ({ name, ... }: {

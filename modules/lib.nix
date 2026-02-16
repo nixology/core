@@ -1,11 +1,6 @@
-main@{ config ? null, inputs, lib ? inputs.flake-parts.inputs.nixpkgs-lib.lib, ... }:
+{ config ? null, inputs, lib ? inputs.flake-parts.inputs.nixpkgs-lib.lib, ... }:
 let
-  flake-parts-lib = main.inputs.flake-parts.lib;
-
-  defaultModule =
-    let
-      inputs = config.partitions.default.extraInputs;
-    in
+  defaultModule = let inputs = config.partitions.default.extraInputs; in
     {
       # default systems
       systems = lib.mkDefault (import inputs.systems);
@@ -32,7 +27,7 @@ let
             ];
           };
         in
-        flake-parts-lib.mkFlake args {
+        inputs.flake-parts.lib.mkFlake args {
           imports = [
             module
             { flake.meta.flakeref = flakeref; }

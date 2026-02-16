@@ -5,10 +5,6 @@
   outputs = { ... }: { };
 
   inputs = {
-    # used for locking and following dependencies; do not access from parent flake
-    main.url = "path:../..";
-
-    # defaults
     nixpkgs.url = "github:nixos/nixpkgs";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     nixpkgs-unfree.url = "github:numtide/nixpkgs-unfree/nixpkgs-unstable";
