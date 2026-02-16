@@ -20,7 +20,7 @@ let
                     imports = [ component ];
                   }
                   # otherwise assume it's a module and wrap it in a component
-                  else {
+                  else builtins.trace "not a component" {
                     key = "${config.flake.meta.flakeref}#components.${domain}.${subdomain}.${name}";
                     imports = [ component.module ] ++ component.dependencies;
                     _class = "flake";
