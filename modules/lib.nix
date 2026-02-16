@@ -15,7 +15,7 @@ let
               module = {
                 imports = [
                   flakeModule
-                  config.partitions.default.module;
+                  config.partitions.default.module
                 ];
               };
             in
