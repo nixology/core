@@ -3,6 +3,7 @@ let
   flake-parts-lib = main.inputs.flake-parts.lib;
 
   defaultModule =
+    { lib, ... }:
     let
       inputs = config.partitions.default.extraInputs;
     in
