@@ -13,7 +13,7 @@ let
       imports = [ inputs.flake-parts.flakeModules.partitions ];
       partitions.${partition} =
         let
-          inputs = config.partitions.default.extraInputs;
+          inputs = config.partitions.${partition}.extraInputs;
         in
         {
           extraInputsFlake = ../partitions/${partition};

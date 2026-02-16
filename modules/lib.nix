@@ -7,6 +7,7 @@ let
     let
       library =
         let
+          defaultModule = config.partitions.default.module;
           mkFlake =
             flakeArgs@{ flakeref, ... }:
             flakeModule:
@@ -15,7 +16,7 @@ let
               module = {
                 imports = [
                   flakeModule
-                  config.partitions.default.module
+                  defaultModule
                 ];
               };
             in
