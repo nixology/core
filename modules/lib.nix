@@ -2,26 +2,27 @@ main@{ config, inputs, ... }:
 let
   flake-parts-lib = main.inputs.flake-parts.lib;
 
-      # capture partition inputs from config of outer flake
-      # so that is is part of the component
+  # capture partition inputs from config of outer flake
+  # so that is is part of the component
   inputs = config.partitions.default.extraInputs;
 
-  builtinModule =
-    let
-    in
+  defaultModule =
     { lib, ... }:
     {
       # default systems
       systems = lib.mkDefault (import inputs.systems);
 
       # default pkgs
-      perSystem = { system, ... }: {
-        _module.args.pkgs = lib.mkDefault (builtins.seq inputs.nixpkgs inputs.nixpkgs.legacyPackages.${system});
-      };
+      perSystem =
+        { system, ... }:
+        {
+          _module.args.pkgs = lib.mkDefault (
+            builtins.seq inputs.nixpkgs inputs.nixpkgs.legacyPackages.${system}
+          );
+        };
     };
 
-  module = let
-  in
+  module =
     { lib, ... }:
     let
       library =
@@ -34,8 +35,7 @@ let
               module = {
                 imports = [
                   flakeModule
-                  #inputs.pkgs.components.nixology.pkgs.nixpkgs
-                  builtinModule
+                  defaultModule
                 ];
               };
             in
