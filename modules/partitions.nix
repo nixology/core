@@ -18,7 +18,13 @@ let
             systems = lib.mkDefault (import inputs.systems);
 
             # default pkgs
-            imports = [ inputs.pkgs.components.nixology.pkgs.nixpkgs ];
+            perSystem =
+              { lib, system, ... }:
+              {
+                _module.args.pkgs = lib.mkDefault (
+                  builtins.seq inputs.nixpkgs inputs.nixpkgs.legacyPackages.${system}
+                );
+              };
           };
       };
     };
