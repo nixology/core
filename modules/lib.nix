@@ -12,7 +12,7 @@ let
 
       # default pkgs
       perSystem =
-        { lib, system, ... }:
+        { system, ... }:
         {
           _module.args.pkgs = lib.mkDefault (
             builtins.seq inputs.nixpkgs inputs.nixpkgs.legacyPackages.${system}
