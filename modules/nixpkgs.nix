@@ -6,14 +6,13 @@ let
 
   module = {
     perSystem = { lib, system, ... }: {
-      _module.args.pkgs = lib.mkDefault (
-        builtins.seq inputs.nixpkgs inputs.nixpkgs.legacyPackages.${system}
-      );
+      _module.args.pkgs = builtins.seq inputs.nixpkgs inputs.nixpkgs.legacyPackages.${system};
     };
   };
 
   component = {
     inherit module;
+    meta.description = "Provides access to standard packages by using nixpkgs as the package source, making it available as the pkgs argument across all perSystem configurations";
   };
 in
 {

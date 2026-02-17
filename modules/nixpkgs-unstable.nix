@@ -6,9 +6,7 @@ let
 
   module = {
     perSystem = { lib, system, ... }: {
-      _module.args.pkgs = lib.mkDefault (
-        builtins.seq inputs.nixpkgs-unstable inputs.nixpkgs-unstable.legacyPackages.${system}
-      );
+      _module.args.pkgs = builtins.seq inputs.nixpkgs-unstable inputs.nixpkgs-unstable.legacyPackages.${system};
     };
   };
 

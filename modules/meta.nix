@@ -8,7 +8,7 @@ let
               freeformType = lazyAttrsOf (unique { inherit message; } raw);
             }
             {
-              options = { inherit flakeref; };
+              options = { inherit components flakeref; };
             }
           ];
         };
@@ -35,6 +35,12 @@ let
         type = str;
         description = "The flake reference for this flake.";
       };
+
+      components = mkOption {
+        type = lazyAttrsOf (lazyAttrsOf (lazyAttrsOf anything));
+        default = { };
+        description = "A set of reusable components.";
+      };
     in
     {
       flake = { inherit meta; };
@@ -43,6 +49,7 @@ let
 
   component = {
     inherit module;
+    meta.description = "Provides metadata infrastructure for flakes, including flakeref tracking and component registry with freeform attributes and structured options for extensible flake metadata";
   };
 in
 {
