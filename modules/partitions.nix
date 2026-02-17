@@ -1,11 +1,21 @@
 { inputs, ... }:
 let
-  default = let partition = "default"; in
+  pkgs = let partition = "pkgs"; in
     {
-      imports = [ inputs.flake-parts.flakeModules.partitions ];
       partitions.${partition}.extraInputsFlake = ../partitions/${partition};
     };
 
-  module = default;
+  systems = let partition = "systems"; in
+    {
+      partitions.${partition}.extraInputsFlake = ../partitions/${partition};
+    };
+
+  module = {
+    imports = with inputs.flake-parts.flakeModules; [
+      partitions
+      pkgs
+      systems
+    ];
+  };
 in
 module

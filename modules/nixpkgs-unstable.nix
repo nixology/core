@@ -2,7 +2,7 @@
 let
   # capture partition inputs from config of outer flake
   # so that is is part of the component
-  inputs = config.partitions.default.extraInputs;
+  inputs = config.partitions.pkgs.extraInputs;
 
   module = {
     perSystem = { lib, system, ... }: {

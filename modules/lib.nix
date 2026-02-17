@@ -1,16 +1,19 @@
 { config ? null, inputs, lib ? inputs.flake-parts.inputs.nixpkgs-lib.lib, ... }:
 let
-  defaultModule = let inputs = config.partitions.default.extraInputs; in
+  defaultModule = let
+    pkgs = config.partitions.pkgs.extraInputs;
+    systems = config.partitions.systems.extraInputs;
+  in
     {
       # default systems
-      systems = lib.mkDefault (import inputs.systems);
+      systems = lib.mkDefault (import systems.systems);
 
       # default pkgs
       perSystem =
         { system, ... }:
         {
           _module.args.pkgs = lib.mkDefault (
-            builtins.seq inputs.nixpkgs inputs.nixpkgs.legacyPackages.${system}
+            builtins.seq pkgs.nixpkgs pkgs.nixpkgs.legacyPackages.${system}
           );
         };
     };
