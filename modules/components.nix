@@ -2,25 +2,23 @@
 let
   module = { config, lib, ... }: {
     options = with lib; with types; let
+      mkComponentModule = { domain, subdomain, name, component }: {
+        key = "${config.flake.meta.flakeref}#components.${domain}.${subdomain}.${name}" +
+          lib.optionalString (component.version != null) ".${component.version}";
+        # conditionally add module config attribute if component has meta attribute
+        ${if (component.meta != null) then "config" else null} =
+          { flake.meta.components.${domain}.${subdomain}.${name} = component.meta; };
+        imports = component.dependencies ++ [ component.module ];
+        _class = "flake";
+        _file = "${moduleLocation}#components.${domain}.${subdomain}.${name}";
+      };
+
       components = mkOption {
         type = lazyAttrsOf (lazyAttrsOf (lazyAttrsOf component));
-
         default = { };
-
         description = "A set of reusable components.";
-
-        # convert components to modules
         apply = mapAttrs (domain: mapAttrs (subdomain: mapAttrs (name: component:
-          {
-            key = "${config.flake.meta.flakeref}#components.${domain}.${subdomain}.${name}" +
-              lib.optionalString (component.version != null) ".${component.version}";
-            # conditionally add module config attribute if component has meta attribute
-            ${if (component.meta != null) then "config" else null} =
-              { flake.meta.components.${domain}.${subdomain}.${name} = component.meta; };
-            imports = component.dependencies ++ [ component.module ];
-            _class = "flake";
-            _file = "${moduleLocation}#components.${domain}.${subdomain}.${name}";
-          }
+          mkComponentModule { inherit domain subdomain name component; }
         )));
       };
 
@@ -72,7 +70,7 @@ let
       };
 
       name = mkOption {
-        type = str;
+        type = nonEmptyStr;
         default = name;
         description = "The name of the component.";
       };
