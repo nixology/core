@@ -5,7 +5,7 @@ let
   inputs = config.partitions.systems.extraInputs;
 
   module = {
-    systems = import inputs.systems-linux;
+    systems = import inputs.default-linux;
   };
 
   component = {

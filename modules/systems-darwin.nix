@@ -5,7 +5,7 @@ let
   inputs = config.partitions.systems.extraInputs;
 
   module = {
-    systems = import inputs.systems-darwin;
+    systems = import inputs.default-darwin;
   };
 
   component = {

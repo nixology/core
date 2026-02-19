@@ -1,13 +1,6 @@
 {
   "nodes": {
-    "root": {
-      "inputs": {
-        "systems": "systems",
-        "systems-darwin": "systems-darwin",
-        "systems-linux": "systems-linux"
-      }
-    },
-    "systems": {
+    "default": {
       "locked": {
         "lastModified": 1681028828,
         "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
@@ -22,7 +15,7 @@
         "type": "github"
       }
     },
-    "systems-darwin": {
+    "default-darwin": {
       "locked": {
         "lastModified": 1689347925,
         "narHash": "sha256-ozenz5bFe1UUqOn7f60HRmgc01BgTGIKZ4Xl+HbocGQ=",
@@ -37,7 +30,7 @@
         "type": "github"
       }
     },
-    "systems-linux": {
+    "default-linux": {
       "locked": {
         "lastModified": 1689347949,
         "narHash": "sha256-12tWmuL2zgBgZkdoB6qXZsgJEH9LR3oUgpaQq2RbI80=",
@@ -50,6 +43,13 @@
         "owner": "nix-systems",
         "repo": "default-linux",
         "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "default": "default",
+        "default-darwin": "default-darwin",
+        "default-linux": "default-linux"
       }
     }
   },

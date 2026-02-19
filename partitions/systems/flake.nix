@@ -5,8 +5,8 @@
   outputs = { ... }: { };
 
   inputs = {
-    systems.url = "github:nix-systems/default";
-    systems-darwin.url = "github:nix-systems/default-darwin";
-    systems-linux.url = "github:nix-systems/default-linux";
+    default.url = "github:nix-systems/default";
+    default-darwin.url = "github:nix-systems/default-darwin";
+    default-linux.url = "github:nix-systems/default-linux";
   };
 }

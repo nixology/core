@@ -8,7 +8,7 @@ let
         # conditionally add module config attribute if component has meta attribute
         ${if (component.meta != null) then "config" else null} =
           { flake.meta.components.${domain}.${subdomain}.${name} = component.meta; };
-        imports = component.dependencies ++ [ component.module ];
+        imports = [ component.module ] ++ component.dependencies;
         _class = "flake";
         _file = "${moduleLocation}#components.${domain}.${subdomain}.${name}";
       };

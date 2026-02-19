@@ -6,7 +6,7 @@ let
 
   module = {
     perSystem = { lib, system, ... }: {
-      _module.args.pkgs = builtins.seq inputs.nixpkgs inputs.nixpkgs.legacyPackages.${system};
+      _module.args.pkgs = lib.mkForce (builtins.seq inputs.nixpkgs inputs.nixpkgs.legacyPackages.${system});
     };
   };
 
@@ -16,6 +16,5 @@ let
   };
 in
 {
-  imports = [ module ];
   flake.components.nixology.std.nixpkgs = component;
 }

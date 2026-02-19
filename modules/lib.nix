@@ -1,19 +1,18 @@
 { config ? null, inputs, lib ? inputs.flake-parts.inputs.nixpkgs-lib.lib, ... }:
 let
+  pkgs = config.partitions.pkgs.extraInputs;
+  systems = config.partitions.systems.extraInputs;
+
   defaultModule =
-    let
-      pkgs = config.partitions.pkgs.extraInputs;
-      systems = config.partitions.systems.extraInputs;
-    in
     {
       # default systems
-      systems = lib.mkDefault (import systems.systems);
+      systems = import systems.default;
 
       # default pkgs
       perSystem =
-        { lib, system, ... }:
+        { system, ... }:
         {
-          _module.args.pkgs = lib.mkDefault (
+          _module.args.pkgs = (
             builtins.seq pkgs.nixpkgs pkgs.nixpkgs.legacyPackages.${system}
           );
         };
@@ -26,17 +25,13 @@ let
           args = builtins.removeAttrs flakeArgs [ "flakeref" ];
           module = {
             imports = [
-              flakeModule
               (lib.mkIf (config != null) defaultModule)
+              flakeModule
+              { flake.meta.flakeref = flakeref; }
             ];
           };
         in
-        inputs.flake-parts.lib.mkFlake args {
-          imports = [
-            module
-            { flake.meta.flakeref = flakeref; }
-          ];
-        };
+        inputs.flake-parts.lib.mkFlake args module;
 
       mkTOMLFlake = flakeArgs: tomlFile:
         let
@@ -65,25 +60,12 @@ let
       inherit mkFlake mkTOMLFlake modulesIn;
     };
 
-  module = { lib, ... }:
-    {
-      options = with lib; with types; {
-        flake.lib = mkOption {
-          type = attrsOf (functionTo anything);
-          default = { };
-          description = "A set of utility functions and definitions.";
-        };
-      };
+  module = { flake.lib = library; };
 
-      config.flake.lib = lib.mkDefault library;
-    };
-
-  component = {
-    inherit module;
-  };
+  component = { inherit module; };
 in
 {
-  flake.lib = library; # this is for lib access when imported directly (i.e. in this flake)
-  imports = [ module ];
+  imports = [ defaultModule ];
+  flake.lib = library;
   flake.components.nixology.std.lib = component;
 }
