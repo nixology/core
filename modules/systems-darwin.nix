@@ -1,11 +1,9 @@
-{ config, lib, ... }:
+{ config, ... }:
 let
-  # capture partition inputs from config of outer flake
-  # so that is is part of the component
-  inputs = config.partitions.systems.extraInputs;
+  systems = config.partitions.systems.extraInputs;
 
   module = {
-    systems = import inputs.default-darwin;
+    systems = import systems.default-darwin;
   };
 
   component = {

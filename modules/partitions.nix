@@ -11,8 +11,8 @@ let
     };
 
   module = {
-    imports = with inputs.flake-parts.flakeModules; [
-      partitions
+    imports = [
+      inputs.flake-parts.flakeModules.partitions
       pkgs
       systems
     ];

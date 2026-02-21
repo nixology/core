@@ -6,15 +6,12 @@ let
   defaultModule =
     {
       # default systems
-      systems = import systems.default;
+      systems = lib.mkDefault (import systems.default);
 
       # default pkgs
-      perSystem =
-        { system, ... }:
+      perSystem = { system, ... }:
         {
-          _module.args.pkgs = (
-            builtins.seq pkgs.nixpkgs pkgs.nixpkgs.legacyPackages.${system}
-          );
+          _module.args.pkgs = lib.mkDefault (builtins.seq pkgs.nixpkgs pkgs.nixpkgs.legacyPackages.${system});
         };
     };
 
@@ -60,7 +57,7 @@ let
       inherit mkFlake mkTOMLFlake modulesIn;
     };
 
-  module = { flake.lib = library; };
+  module = { flake.lib = lib.mkDefault library; };
 
   component = { inherit module; };
 in
