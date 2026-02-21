@@ -22,9 +22,11 @@ let
           args = builtins.removeAttrs flakeArgs [ "flakeref" ];
           module = {
             imports = [
-              (lib.mkIf (config != null) defaultModule)
               flakeModule
               { flake.meta.flakeref = flakeref; }
+            ] ++ lib.optionals (config != null) [
+              defaultModule
+              inputs.self.components.nixology.std.meta
             ];
           };
         in
