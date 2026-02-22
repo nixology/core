@@ -11,5 +11,5 @@ let
   };
 in
 {
-  flake.components.nixology.std.systems-darwin = component;
+  flake.components.nixology.systems.darwin = component;
 }

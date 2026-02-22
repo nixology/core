@@ -14,5 +14,5 @@ let
   };
 in
 {
-  flake.components.nixology.std.nixpkgs-unfree = component;
+  flake.components.nixology.pkgs.nixpkgs-unfree = component;
 }

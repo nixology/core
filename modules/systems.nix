@@ -11,5 +11,5 @@ let
   };
 in
 {
-  flake.components.nixology.std.systems = component;
+  flake.components.nixology.systems.default = component;
 }

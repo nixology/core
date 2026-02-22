@@ -11,5 +11,5 @@ let
   };
 in
 {
-  flake.components.nixology.std.systems-linux = component;
+  flake.components.nixology.systems.linux = component;
 }

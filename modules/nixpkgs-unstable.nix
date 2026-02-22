@@ -13,5 +13,5 @@ let
   };
 in
 {
-  flake.components.nixology.std.nixpkgs-unstable = component;
+  flake.components.nixology.pkgs.nixpkgs-unstable = component;
 }
