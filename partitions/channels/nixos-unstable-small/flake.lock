@@ -1,0 +1,24 @@
+{
+  "nodes": {
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1771742218,
+        "narHash": "sha256-XdsHN8HOYAChAGmXwEG8TAkBA5Lu8gJ3N8GCrIB7Nf4=",
+        "rev": "aaf43e7c58bb8093a6325ef1d7b4af616779abc5",
+        "type": "tarball",
+        "url": "https://releases.nixos.org/nixos/unstable-small/nixos-26.05pre950241.aaf43e7c58bb/nixexprs.tar.xz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://channels.nixos.org/nixos-unstable-small/nixexprs.tar.xz"
+      }
+    },
+    "root": {
+      "inputs": {
+        "nixpkgs": "nixpkgs"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

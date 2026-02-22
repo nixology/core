@@ -1,6 +1,6 @@
 { config ? null, inputs, lib ? inputs.flake-parts.inputs.nixpkgs-lib.lib, ... }:
 let
-  pkgs = config.partitions.pkgs.extraInputs;
+  pkgs = config.partitions.channels-unstable.extraInputs;
   systems = config.partitions.systems.extraInputs;
 
   defaultModule =

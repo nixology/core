@@ -1,9 +1,10 @@
-{ config, ... }:
+{ config, lib, ... }:
 let
   systems = config.partitions.systems.extraInputs;
 
   module = {
-    systems = import systems.default-linux;
+    # n.b. don't want merge semantics here; exclusively want linux systems, so mkForce
+    systems = lib.mkForce (import systems.default-linux);
   };
 
   component = {

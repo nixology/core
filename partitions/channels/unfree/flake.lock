@@ -1,32 +1,6 @@
 {
   "nodes": {
     "nixpkgs": {
-      "locked": {
-        "lastModified": 1771574726,
-        "narHash": "sha256-6hAWXm2w/y2Lm9V9hydUGaNnPq8D8t0bRPf7ojfq/7k=",
-        "rev": "c217913993d6c6f6805c3b1a3bda5e639adfde6d",
-        "type": "tarball",
-        "url": "https://releases.nixos.org/nixos/25.11/nixos-25.11.6327.c217913993d6/nixexprs.tar.xz"
-      },
-      "original": {
-        "type": "tarball",
-        "url": "https://channels.nixos.org/nixos-25.11/nixexprs.tar.xz"
-      }
-    },
-    "nixpkgs-darwin": {
-      "locked": {
-        "lastModified": 1771648058,
-        "narHash": "sha256-FxyacIgH/1LPHguSjU2vh3mLfEqhF2X8CPCNcyu00oU=",
-        "rev": "fef5f9900448b65d254ab378d6b107e9dec4dd56",
-        "type": "tarball",
-        "url": "https://releases.nixos.org/nixpkgs/25.11-darwin/nixpkgs-darwin-25.11pre908193.fef5f9900448/nixexprs.tar.xz"
-      },
-      "original": {
-        "type": "tarball",
-        "url": "https://channels.nixos.org/nixpkgs-25.11-darwin/nixexprs.tar.xz"
-      }
-    },
-    "nixpkgs-unfree": {
       "inputs": {
         "nixpkgs": [
           "nixpkgs-unstable"
@@ -48,6 +22,20 @@
       }
     },
     "nixpkgs-unstable": {
+      "inputs": {
+        "nixpkgs": "nixpkgs_2"
+      },
+      "locked": {
+        "path": "../unstable",
+        "type": "path"
+      },
+      "original": {
+        "path": "../unstable",
+        "type": "path"
+      },
+      "parent": []
+    },
+    "nixpkgs_2": {
       "locked": {
         "lastModified": 1771207753,
         "narHash": "sha256-7o+iRF++GO/gGrgrRMlnld2V/3QIzpdwMKViVkHtMEQ=",
@@ -63,8 +51,6 @@
     "root": {
       "inputs": {
         "nixpkgs": "nixpkgs",
-        "nixpkgs-darwin": "nixpkgs-darwin",
-        "nixpkgs-unfree": "nixpkgs-unfree",
         "nixpkgs-unstable": "nixpkgs-unstable"
       }
     }

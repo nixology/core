@@ -1,41 +1,10 @@
 {
   "nodes": {
     "nixpkgs": {
-      "locked": {
-        "lastModified": 1771419570,
-        "narHash": "sha256-bxAlQgre3pcQcaRUm/8A0v/X8d2nhfraWSFqVmMcBcU=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "6d41bc27aaf7b6a3ba6b169db3bd5d6159cfaa47",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "ref": "nixos-25.11",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
-    "nixpkgs-darwin": {
-      "locked": {
-        "lastModified": 1771648058,
-        "narHash": "sha256-Gw8jXVDZr7/X9mx6DwUMxTDYWIpta5Mb8oQBkhPur+g=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "fef5f9900448b65d254ab378d6b107e9dec4dd56",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "ref": "nixpkgs-25.11-darwin",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
-    "nixpkgs-unfree": {
       "inputs": {
         "nixpkgs": [
-          "nixpkgs-unstable"
+          "nixpkgs-unstable",
+          "nixpkgs"
         ]
       },
       "locked": {
@@ -54,6 +23,26 @@
       }
     },
     "nixpkgs-unstable": {
+      "inputs": {
+        "nixpkgs": "nixpkgs_2"
+      },
+      "locked": {
+        "dir": "partitions/nixpkgs/unstable",
+        "lastModified": 1771784811,
+        "narHash": "sha256-/LhS5ZzuUOw9izW1aFfzDqgNH7MPCZE9kXKg65D2N3I=",
+        "ref": "refs/heads/main",
+        "rev": "fe3e6eb4de3237ebfb12f6559b4ad033eb4d3250",
+        "revCount": 30,
+        "type": "git",
+        "url": "ssh://git@github.com/marksisson/std"
+      },
+      "original": {
+        "dir": "partitions/nixpkgs/unstable",
+        "type": "git",
+        "url": "ssh://git@github.com/marksisson/std"
+      }
+    },
+    "nixpkgs_2": {
       "locked": {
         "lastModified": 1771207753,
         "narHash": "sha256-b9uG8yN50DRQ6A7JdZBfzq718ryYrlmGgqkRm9OOwCE=",
@@ -72,8 +61,6 @@
     "root": {
       "inputs": {
         "nixpkgs": "nixpkgs",
-        "nixpkgs-darwin": "nixpkgs-darwin",
-        "nixpkgs-unfree": "nixpkgs-unfree",
         "nixpkgs-unstable": "nixpkgs-unstable"
       }
     }

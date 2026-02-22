@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, lib, ... }:
 let
   systems = config.partitions.systems.extraInputs;
 

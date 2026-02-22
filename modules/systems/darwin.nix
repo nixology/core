@@ -1,9 +1,10 @@
-{ config, ... }:
+{ config, lib, ... }:
 let
   systems = config.partitions.systems.extraInputs;
 
   module = {
-    systems = import systems.default-darwin;
+    # n.b. don't want merge semantics here; exclusively want darwin systems, so mkForce
+    systems = lib.mkForce (import systems.default-darwin);
   };
 
   component = {
