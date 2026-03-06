@@ -1,6 +1,6 @@
 { inputs, ... }:
 let
-  pkgs = [ "darwin" "nixos" "unfree" "unstable" ];
+  pkgs = [ "darwin" "nixos" "nixos-small" "nixos-unstable" "nixos-unstable-small" "unfree" "unstable" ];
 
   channels = let partition = "channels"; in map (pkgs:
     {
