@@ -1,18 +1,22 @@
 { inputs, ... }:
 let
-  pkgs = [ "darwin" "nixos" "nixos-small" "nixos-unstable" "nixos-unstable-small" "unfree" "unstable" ];
+  variants = [ "darwin" "nixos" "nixos-small" "nixos-unstable" "nixos-unstable-small" "unfree" "unstable" ];
 
-  channels = let partition = "channels"; in map (pkgs:
-    {
-      partitions."${partition}-${pkgs}".extraInputsFlake = ../partitions/${partition}/${pkgs};
-    }
-  ) pkgs;
+  channels = let partition = "channels"; in map
+    (variant:
+      {
+        partitions."${partition}-${variant}".extraInputsFlake = ../partitions/${partition}/${variant};
+      }
+    )
+    variants;
 
-  nixpkgs = let partition = "nixpkgs"; in map (pkgs:
-    {
-      partitions."${partition}-${pkgs}".extraInputsFlake = ../partitions/${partition}/${pkgs};
-    }
-  ) pkgs;
+  pkgs = let partition = "pkgs"; in map
+    (variant:
+      {
+        partitions."${partition}-${variant}".extraInputsFlake = ../partitions/${partition}/${variant};
+      }
+    )
+    variants;
 
   systems = let partition = "systems"; in
     {
@@ -23,7 +27,7 @@ let
     imports = [
       inputs.flake-parts.flakeModules.partitions
       systems
-    ] ++ channels ++ nixpkgs;
+    ] ++ channels ++ pkgs;
   };
 in
 module
