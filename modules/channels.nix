@@ -24,7 +24,7 @@ let
     variants;
 in
 builtins.foldl' lib.recursiveUpdate { } (map
-  (channel:
-  { flake.components.nixology.channels.${channel.variant} = channel.component; }
-  )
+  (channel: {
+    flake.components = { nixology.channels.${channel.variant} = channel.component; };
+  })
   channels)

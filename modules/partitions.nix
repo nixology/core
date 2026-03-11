@@ -18,6 +18,11 @@ let
     )
     variants;
 
+  schemas = let partition = "schemas"; in
+    {
+      partitions.${partition}.extraInputsFlake = ../partitions/${partition};
+    };
+
   systems = let partition = "systems"; in
     {
       partitions.${partition}.extraInputsFlake = ../partitions/${partition};
@@ -26,6 +31,7 @@ let
   module = {
     imports = [
       inputs.flake-parts.flakeModules.partitions
+      schemas
       systems
     ] ++ channels ++ pkgs;
   };

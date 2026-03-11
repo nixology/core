@@ -24,7 +24,7 @@ let
     variants;
 in
 builtins.foldl' lib.recursiveUpdate { } (map
-  (pkgs':
-  { flake.components.nixology.pkgs.${pkgs'.variant} = pkgs'.component; }
-  )
+  (pkgs': {
+    flake.components = { nixology.pkgs.${pkgs'.variant} = pkgs'.component; };
+  })
   pkgs)

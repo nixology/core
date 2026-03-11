@@ -88,13 +88,13 @@ let
 
   component = {
     inherit module;
-    dependencies = with inputs.self; [
-      components.nixology.std.meta
+    dependencies = with inputs.self.components; [
+      nixology.std.meta
     ];
     meta.description = "Provides a reusable component system for organizing flake modules into a structured domain.subdomain.name hierarchy with support for versioning, dependencies, and metadata";
   };
 in
 {
   imports = [ module ];
-  flake.components.nixology.std.components = component;
+  flake.components = { nixology.std.components = component; };
 }

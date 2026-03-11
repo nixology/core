@@ -54,5 +54,5 @@ let
 in
 {
   imports = [ module ];
-  flake.components.nixology.std.meta = component;
+  flake.components = { nixology.std.meta = component; };
 }

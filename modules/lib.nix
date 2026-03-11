@@ -24,10 +24,10 @@ let
             imports = [
               flakeModule
               { flake.meta.flakeref = flakeref; }
-            ] ++ lib.optionals (config != null) [
+            ] ++ lib.optionals (config != null) (with inputs.self.components; [
               defaultModule
-              inputs.self.components.nixology.std.meta
-            ];
+              nixology.std.meta
+            ]);
           };
         in
         inputs.flake-parts.lib.mkFlake args module;
@@ -66,5 +66,5 @@ in
 {
   imports = [ defaultModule ];
   flake.lib = library;
-  flake.components.nixology.std.lib = component;
+  flake.components = { nixology.std.lib = component; };
 }
