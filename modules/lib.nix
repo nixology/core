@@ -26,7 +26,7 @@ let
               { flake.meta.flakeref = flakeref; }
             ] ++ lib.optionals (config != null) (with inputs.self.components; [
               defaultModule
-              nixology.std.meta
+              nixology.std.meta.module
             ]);
           };
         in
@@ -61,7 +61,12 @@ let
 
   module = { flake.lib = lib.mkDefault library; };
 
-  component = { inherit module; };
+  component = {
+    inherit module;
+    meta = {
+      shortDescription = "library of functions for nixology methodology";
+    };
+  };
 in
 {
   imports = [ defaultModule ];

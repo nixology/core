@@ -73,8 +73,11 @@ let
                 let
                   recurse = prefix: attrs: builtins.mapAttrs
                     (attrName: attrs:
-                      if (lib.isAttrs attrs && (attrs ? imports || attrs ? config || attrs ? options)) || lib.isFunction attrs then {
-                        what = "component";
+                      if (lib.isAttrs attrs && (attrs ? module && attrs ? _resolved)) then {
+                        what =
+                          if (attrs ? meta && attrs.meta ? shortDescription && attrs.meta.shortDescription != null)
+                          then "component (${attrs.meta.shortDescription})"
+                          else "component";
                       }
                       else {
                         children = recurse (prefix + "." + attrName) attrs;
@@ -140,6 +143,9 @@ let
         inherit output;
         component = {
           inherit module;
+          meta = {
+            shortDescription = "flake schema";
+          };
         };
       }
     )

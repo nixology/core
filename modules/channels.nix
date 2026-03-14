@@ -17,7 +17,10 @@ let
         inherit variant;
         component = {
           inherit module;
-          meta.description = "Provides access to standard packages by using ${variant} channel as the package source, making it available as the pkgs argument across all perSystem configurations";
+          meta = {
+            description = "Provides access to standard packages by using ${variant} channel as the package source, making it available as the pkgs argument across all perSystem configurations";
+            shortDescription = "package set fetched from channel tarball";
+          };
         };
       }
     )

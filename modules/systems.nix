@@ -19,6 +19,9 @@ let
         inherit variant;
         component = {
           inherit module;
+          meta = {
+            shortDescription = "flake systems";
+          };
         };
       }
     )

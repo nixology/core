@@ -2,15 +2,9 @@ let
   module = { lib, ... }: {
     options = with lib; with types; let
       meta = mkOption {
-        type = submoduleWith {
-          modules = [
-            {
-              freeformType = lazyAttrsOf (unique { inherit message; } raw);
-            }
-            {
-              options = { inherit components flakeref; };
-            }
-          ];
+        type = submodule {
+          options = { inherit flakeref; };
+          freeformType = lazyAttrsOf (unique { inherit message; } raw);
         };
         inherit description;
       };
@@ -35,12 +29,6 @@ let
         type = str;
         description = "The flake reference for this flake.";
       };
-
-      components = mkOption {
-        type = lazyAttrsOf (lazyAttrsOf (lazyAttrsOf anything));
-        default = { };
-        description = "A set of reusable components.";
-      };
     in
     {
       flake = { inherit meta; };
@@ -49,7 +37,10 @@ let
 
   component = {
     inherit module;
-    meta.description = "Provides metadata infrastructure for flakes, including flakeref tracking and component registry with freeform attributes and structured options for extensible flake metadata";
+    meta = {
+      description = "Provides metadata infrastructure for flakes, including flakeref tracking.";
+      shortDescription = "metadata infrastructure for flakes";
+    };
   };
 in
 {
