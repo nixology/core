@@ -1,38 +1,34 @@
 { config ? null, inputs, lib ? inputs.flake-parts.inputs.nixpkgs-lib.lib, ... }:
 let
-  pkgs = config.partitions.channels-unstable.extraInputs;
-  systems = config.partitions.systems.extraInputs;
+  flake-schemas = config.partitions.schemas.extraInputs.flake-schemas;
+
+  nixpkgs = config.partitions.channels-unstable.extraInputs.nixpkgs;
+  systems = config.partitions.systems.extraInputs.default;
+
   flake-parts-lib = inputs.flake-parts.lib;
 
   defaultModule =
     {
       imports = [
-        #        "${inputs.flake-parts}/modules/apps.nix"
-        #        "${inputs.flake-parts}/modules/checks.nix"
-        #"${inputs.flake-parts}/modules/debug.nix"
-        #        "${inputs.flake-parts}/modules/devShells.nix"
         "${inputs.flake-parts}/modules/flake.nix"
-        #        "${inputs.flake-parts}/modules/formatter.nix"
-        #        "${inputs.flake-parts}/modules/legacyPackages.nix"
-        #        "${inputs.flake-parts}/modules/moduleWithSystem.nix"
-        #        "${inputs.flake-parts}/modules/nixosConfigurations.nix"
-        #        "${inputs.flake-parts}/modules/nixosModules.nix"
+        "${inputs.flake-parts}/modules/moduleWithSystem.nix"
         "${inputs.flake-parts}/modules/nixpkgs.nix"
-        #        "${inputs.flake-parts}/modules/overlays.nix"
-        #        "${inputs.flake-parts}/modules/packages.nix"
         "${inputs.flake-parts}/modules/perSystem.nix"
-        #        "${inputs.flake-parts}/modules/transposition.nix"
-        #        "${inputs.flake-parts}/modules/withSystem.nix"
+        "${inputs.flake-parts}/modules/transposition.nix"
+        "${inputs.flake-parts}/modules/withSystem.nix"
       ];
-
-      # default systems
-      systems = lib.mkDefault (import systems.default);
 
       # default pkgs
       perSystem = { system, ... }:
         {
-          _module.args.pkgs = lib.mkDefault (builtins.seq pkgs.nixpkgs pkgs.nixpkgs.legacyPackages.${system});
+          _module.args.pkgs = lib.mkDefault (builtins.seq nixpkgs nixpkgs.legacyPackages.${system});
         };
+
+      # default systems
+      systems = lib.mkDefault (import systems);
+
+      # default transposed attributes
+      transposition = lib.mkOptionDefault { };
     };
 
   library =
@@ -65,7 +61,8 @@ let
             inherit self flake-parts-lib moduleLocation;
             inputs = args.inputs;
           } // specialArgs;
-          modules = [ (lib.setDefaultModuleLocation errorLocation module) ];
+          modules = [ (lib.setDefaultModuleLocation errorLocation module) ] ++
+            lib.optionals (config != null) [ defaultModule ];
           class = "flake";
         }
         );
@@ -78,11 +75,9 @@ let
               flakeModule
               { flake.meta.flakeref = flakeref; }
             ] ++ lib.optionals (config != null) (with inputs.self.components; [
-              defaultModule
               nixology.std.meta.module
             ]);
           };
-          #eval = inputs.flake-parts.lib.evalFlakeModule args module;
           eval = evalFlakeModule args module;
         in
         eval.config.flake;
@@ -111,15 +106,33 @@ let
       moduleFiles;
     in
     {
-      inherit mkFlake mkTOMLFlake modulesIn;
+      inherit evalFlakeModule mkFlake mkTOMLFlake modulesIn;
     };
 
-  module = { flake.lib = lib.mkDefault library; };
+  schema = {
+    version = 1;
+    doc = ''
+      The `lib` flake output provides a collection of functions.
+    '';
+    inventory = let inherit (flake-schemas.lib) mkChildren; in
+      output: mkChildren (
+        builtins.mapAttrs
+          (name: value: {
+            what = if builtins.isFunction value then "library function" else "library value";
+          })
+          output
+      );
+  };
+
+  module = {
+    flake.lib = lib.mkDefault library;
+    flake.schemas.lib = schema;
+  };
 
   component = {
     inherit module;
     dependencies = with inputs.self.components; [
-      nixology.schemas.lib
+      nixology.std.schemas
     ];
     meta = {
       shortDescription = "library of functions for nixology methodology";
@@ -128,6 +141,9 @@ let
 in
 {
   imports = [ defaultModule ];
+
   flake.lib = library;
+  flake.schemas.lib = schema;
+
   flake.components = { nixology.std.lib = component; };
 }

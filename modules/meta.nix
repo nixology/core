@@ -1,5 +1,7 @@
-{ inputs, ... }:
+{ config, inputs, ... }:
 let
+  flake-schemas = config.partitions.schemas.extraInputs.flake-schemas;
+
   module = { lib, ... }: {
     options = with lib; with types; let
       meta = mkOption {
@@ -27,12 +29,29 @@ let
     {
       flake = { inherit meta; };
     };
+
+    config = {
+      flake.schemas.meta = {
+        version = 1;
+        doc = ''
+          The `meta` flake output provides metadata about the flake.
+        '';
+        inventory = let inherit (flake-schemas.lib) mkChildren; in
+          output: mkChildren (builtins.mapAttrs
+            (name: value:
+              {
+                what = "${if name == "components" then "metadata for components defined in the flake" else
+            if ! builtins.isAttrs value then value else "attribute set" }";
+              })
+            output);
+      };
+    };
   };
 
   component = {
     inherit module;
     dependencies = with inputs.self.components; [
-      nixology.schemas.meta
+      nixology.std.schemas
     ];
     meta = {
       description = "Provides metadata infrastructure for flakes, including flakeref tracking.";

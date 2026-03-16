@@ -1,5 +1,7 @@
 { config, inputs, moduleLocation, ... }:
 let
+  flake-schemas = config.partitions.schemas.extraInputs.flake-schemas;
+
   module = { config, lib, ... }: {
     options = with lib; with types; let
       resolveComponentModule = { domain, subdomain, component }:
@@ -9,7 +11,7 @@ let
           module = {
             key = "${config.flake.meta.flakeref}#components.${domain}.${subdomain}.${component.meta.name}" +
               lib.optionalString (component.meta.version != null) ".${component.meta.version}";
-            imports = [ component.module ] ++ (builtins.map (dependency: dependency.module) component.dependencies);
+            imports = [ component.module ] ++ (map (dependency: dependency.module) component.dependencies);
             _class = "flake";
             _file = "${moduleLocation}#components.${domain}.${subdomain}.${component.meta.name}";
           };
@@ -97,13 +99,45 @@ let
     {
       flake = { inherit components; };
     };
+
+    config = {
+      flake.schemas.components = {
+        version = 1;
+        doc = ''
+          The `components` flake output provides importable components.
+        '';
+        inventory = let inherit (flake-schemas.lib) mkChildren; in
+          output: mkChildren (builtins.mapAttrs
+            (name: value: {
+              children =
+                let
+                  recurse = prefix: attrs: builtins.mapAttrs
+                    (attrName: attrs:
+                      if (lib.isAttrs attrs && (attrs ? module && attrs ? _resolved)) then {
+                        what =
+                          if (attrs ? meta && attrs.meta ? shortDescription && attrs.meta.shortDescription != null)
+                          then "component (${attrs.meta.shortDescription})"
+                          else "component";
+                      }
+                      else {
+                        children = recurse (prefix + "." + attrName) attrs;
+                      }
+                    )
+                    attrs;
+                in
+                recurse name value;
+            })
+            output
+          );
+      };
+    };
   };
 
   component = {
     inherit module;
     dependencies = with inputs.self.components; [
       nixology.std.meta
-      nixology.schemas.components
+      nixology.std.schemas
     ];
     meta = {
       description = "Provides a reusable component system for flake modules organized into a structured domain.subdomain.name hierarchy with support for dependencies and metadata";
