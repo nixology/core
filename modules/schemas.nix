@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ config, inputs, lib, ... }:
 let
   outputs = [
     "apps"
@@ -28,11 +28,11 @@ let
     "meta"
   ];
 
-  inputs = config.partitions.schemas.extraInputs;
+  extraInputs = config.partitions.schemas.extraInputs;
 
-  inherit (inputs.flake-schemas.lib) mkChildren;
+  inherit (extraInputs.flake-schemas.lib) mkChildren;
 
-  flake-schemas = inputs.flake-schemas.schemas // {
+  flake-schemas = extraInputs.flake-schemas.schemas // {
     allSystems = {
       version = 1;
       doc = ''
@@ -132,7 +132,22 @@ let
     };
   };
 
-  schemas = map
+  module = { lib, ... }: {
+    options = with lib; with types;
+      {
+        flake.schemas = mkOption {
+          type = lazyAttrsOf (lazyAttrsOf anything);
+          default = { };
+          description = "Schemas for flake output types.";
+        };
+      };
+  };
+
+  component = {
+    inherit module;
+  };
+
+  schemas = builtins.listToAttrs (map
     (output:
       let
         module = {
@@ -140,22 +155,32 @@ let
         };
       in
       {
-        inherit output;
-        component = {
+        name = output;
+        value = {
           inherit module;
+          dependencies = with inputs.self.components; [
+            nixology.std.schemas
+          ];
           meta = {
             shortDescription = "flake schema";
           };
         };
       }
     )
-    outputs;
+    outputs);
 in
 {
-  imports = [{ flake.schemas = flake-schemas; }];
+  imports = [
+    module
+    schemas.allSystems.module
+    schemas.components.module
+    schemas.debug.module
+    schemas.lib.module
+    schemas.meta.module
+    schemas.schemas.module
+  ];
 } //
-builtins.foldl' lib.recursiveUpdate { } (map
-  (schema: {
-    flake.components = { nixology.schemas.${schema.output} = schema.component; };
-  })
-  schemas)
+{
+  flake.components = { nixology.std.schemas = component; };
+  flake.components = { nixology.schemas = schemas; };
+}

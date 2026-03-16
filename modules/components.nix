@@ -103,6 +103,7 @@ let
     inherit module;
     dependencies = with inputs.self.components; [
       nixology.std.meta
+      nixology.schemas.components
     ];
     meta = {
       description = "Provides a reusable component system for flake modules organized into a structured domain.subdomain.name hierarchy with support for dependencies and metadata";

@@ -1,3 +1,4 @@
+{ inputs, ... }:
 let
   module = { lib, ... }: {
     options = with lib; with types; let
@@ -6,15 +7,8 @@ let
           options = { inherit flakeref; };
           freeformType = lazyAttrsOf (unique { inherit message; } raw);
         };
-        inherit description;
+        description = "Metadata about the flake.";
       };
-
-      description = ''
-        Metadata about the flake.
-        Raw attributes. Any attribute can be set here, but some
-        attributes are represented by options, to provide appropriate
-        configuration merging.
-      '';
 
       message = ''
         No option has been declared for this attribute, so its definitions can't be merged automatically.
@@ -37,6 +31,9 @@ let
 
   component = {
     inherit module;
+    dependencies = with inputs.self.components; [
+      nixology.schemas.meta
+    ];
     meta = {
       description = "Provides metadata infrastructure for flakes, including flakeref tracking.";
       shortDescription = "metadata infrastructure for flakes";
