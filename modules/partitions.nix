@@ -30,7 +30,6 @@ let
 
   module = {
     imports = [
-      inputs.flake-parts.flakeModules.partitions
       schemas
       systems
     ] ++ channels ++ pkgs;
