@@ -5,11 +5,12 @@ let
   module = { config, lib, ... }: {
     options = with lib; with types; let
       resolveComponentModule = { domain, subdomain, component }:
+        assert config.flakeref != null || throw "flakeref must not be null";
         if component._resolved == true then component
         else component // {
           _resolved = true;
           module = {
-            key = "${config.flake.meta.flakeref}#components.${domain}.${subdomain}.${component.meta.name}" +
+            key = "${config.flakeref}#components.${domain}.${subdomain}.${component.meta.name}" +
               lib.optionalString (component.meta.version != null) ".${component.meta.version}";
             imports = [ component.module ] ++ (map (dependency: dependency.module) component.dependencies);
             _class = "flake";
@@ -136,7 +137,7 @@ let
   component = {
     inherit module;
     dependencies = with inputs.self.components; [
-      nixology.std.meta
+      nixology.std.flakeref
       nixology.std.schemas
     ];
     meta = {

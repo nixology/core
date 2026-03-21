@@ -4,7 +4,6 @@
   inputs.flake-parts.url = "github:hercules-ci/flake-parts";
 
   outputs = inputs:
-    let flakeref = "github:nixology/std"; in
     with import ./modules/std/lib.nix { inherit inputs; }; with flake.lib;
-    mkFlake { inherit flakeref inputs; } { imports = modulesIn ./modules; };
+    mkFlake { inherit inputs; } { imports = modulesIn ./modules; };
 }

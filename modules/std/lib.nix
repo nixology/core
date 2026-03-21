@@ -1,38 +1,12 @@
 { config ? null, inputs, lib ? inputs.flake-parts.inputs.nixpkgs-lib.lib, ... }:
 let
   flake-schemas = config.partitions.schemas.extraInputs.flake-schemas;
-
-  nixpkgs = config.partitions.channels-unstable.extraInputs.nixpkgs;
-  systems = config.partitions.systems.extraInputs.default;
-
   flake-parts-lib = inputs.flake-parts.lib;
-
-  defaultModule =
-    {
-      imports = [
-        "${inputs.flake-parts}/modules/flake.nix"
-        "${inputs.flake-parts}/modules/moduleWithSystem.nix"
-        "${inputs.flake-parts}/modules/nixpkgs.nix"
-        "${inputs.flake-parts}/modules/perSystem.nix"
-        "${inputs.flake-parts}/modules/transposition.nix"
-        "${inputs.flake-parts}/modules/withSystem.nix"
-      ];
-
-      # default pkgs
-      perSystem = { system, ... }:
-        {
-          _module.args.pkgs = lib.mkDefault (builtins.seq nixpkgs nixpkgs.legacyPackages.${system});
-        };
-
-      # default systems
-      systems = lib.mkDefault (import systems);
-
-      # default transposed attributes
-      transposition = lib.mkOptionDefault { };
-    };
 
   library =
     let
+      stdInputs = inputs;
+
       evalFlakeModule =
         args@
         { inputs
@@ -62,23 +36,17 @@ let
             inputs = args.inputs;
           } // specialArgs;
           modules = [ (lib.setDefaultModuleLocation errorLocation module) ] ++
-            lib.optionals (config != null) [ defaultModule ];
+            lib.optionals (config != null)
+              (with stdInputs.self.components; map (component: component.module) [
+                nixology.std.default
+              ]);
           class = "flake";
         }
         );
 
-      mkFlake = flakeArgs@{ flakeref, ... }: flakeModule:
+      mkFlake = flakeArgs: flakeModule:
         let
-          args = builtins.removeAttrs flakeArgs [ "flakeref" ];
-          module = {
-            imports = [
-              flakeModule
-              { flake.meta.flakeref = flakeref; }
-            ] ++ lib.optionals (config != null) (with inputs.self.components; [
-              nixology.std.meta.module
-            ]);
-          };
-          eval = evalFlakeModule args module;
+          eval = evalFlakeModule flakeArgs flakeModule;
         in
         eval.config.flake;
 
@@ -140,8 +108,6 @@ let
   };
 in
 {
-  imports = [ defaultModule ];
-
   flake.lib = library;
   flake.schemas.lib = schema;
 
