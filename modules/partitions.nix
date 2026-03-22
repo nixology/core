@@ -1,29 +1,43 @@
 { inputs, ... }:
 let
-  variants = [ "darwin" "nixos" "nixos-small" "nixos-unstable" "nixos-unstable-small" "unfree" "unstable" ];
+  variants = [
+    "darwin"
+    "nixos"
+    "nixos-small"
+    "nixos-unstable"
+    "nixos-unstable-small"
+    "unfree"
+    "unstable"
+  ];
 
-  channels = let partition = "channels"; in map
-    (variant:
-      {
-        partitions."${partition}-${variant}".extraInputsFlake = ../partitions/${partition}/${variant};
-      }
-    )
-    variants;
+  channels =
+    let
+      partition = "channels";
+    in
+    map (variant: {
+      partitions."${partition}-${variant}".extraInputsFlake = ../partitions/${partition}/${variant};
+    }) variants;
 
-  pkgs = let partition = "pkgs"; in map
-    (variant:
-      {
-        partitions."${partition}-${variant}".extraInputsFlake = ../partitions/${partition}/${variant};
-      }
-    )
-    variants;
+  pkgs =
+    let
+      partition = "pkgs";
+    in
+    map (variant: {
+      partitions."${partition}-${variant}".extraInputsFlake = ../partitions/${partition}/${variant};
+    }) variants;
 
-  schemas = let partition = "schemas"; in
+  schemas =
+    let
+      partition = "schemas";
+    in
     {
       partitions.${partition}.extraInputsFlake = ../partitions/${partition};
     };
 
-  systems = let partition = "systems"; in
+  systems =
+    let
+      partition = "systems";
+    in
     {
       partitions.${partition}.extraInputsFlake = ../partitions/${partition};
     };
@@ -32,7 +46,9 @@ let
     imports = [
       schemas
       systems
-    ] ++ channels ++ pkgs;
+    ]
+    ++ channels
+    ++ pkgs;
   };
 in
 module

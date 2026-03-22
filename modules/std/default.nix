@@ -1,31 +1,36 @@
-{ config, inputs, lib, ... }:
+{
+  config,
+  inputs,
+  lib,
+  ...
+}:
 let
   nixpkgs = config.partitions.channels-unstable.extraInputs.nixpkgs;
   systems = config.partitions.systems.extraInputs.default;
 
-  module =
-    {
-      imports = [
-        "${inputs.flake-parts}/modules/flake.nix"
-        "${inputs.flake-parts}/modules/moduleWithSystem.nix"
-        "${inputs.flake-parts}/modules/nixpkgs.nix"
-        "${inputs.flake-parts}/modules/perSystem.nix"
-        "${inputs.flake-parts}/modules/transposition.nix"
-        "${inputs.flake-parts}/modules/withSystem.nix"
-      ];
+  module = {
+    imports = [
+      "${inputs.flake-parts}/modules/flake.nix"
+      "${inputs.flake-parts}/modules/moduleWithSystem.nix"
+      "${inputs.flake-parts}/modules/nixpkgs.nix"
+      "${inputs.flake-parts}/modules/perSystem.nix"
+      "${inputs.flake-parts}/modules/transposition.nix"
+      "${inputs.flake-parts}/modules/withSystem.nix"
+    ];
 
-      # default pkgs
-      perSystem = { system, ... }:
-        {
-          _module.args.pkgs = lib.mkDefault (builtins.seq nixpkgs nixpkgs.legacyPackages.${system});
-        };
+    # default pkgs
+    perSystem =
+      { system, ... }:
+      {
+        _module.args.pkgs = lib.mkDefault (builtins.seq nixpkgs nixpkgs.legacyPackages.${system});
+      };
 
-      # default systems
-      systems = lib.mkDefault (import systems);
+    # default systems
+    systems = lib.mkDefault (import systems);
 
-      # default transposed attributes
-      transposition = lib.mkOptionDefault { };
-    };
+    # default transposed attributes
+    transposition = lib.mkOptionDefault { };
+  };
 
   component = {
     inherit module;
@@ -36,5 +41,7 @@ let
 in
 {
   imports = [ module ];
-  flake.components = { nixology.std.default = component; };
+  flake.components = {
+    nixology.std.default = component;
+  };
 }

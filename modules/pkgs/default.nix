@@ -1,33 +1,44 @@
 { config, lib, ... }:
 let
-  variants = [ "darwin" "nixos" "nixos-small" "nixos-unstable" "nixos-unstable-small" "unfree" "unstable" ];
+  variants = [
+    "darwin"
+    "nixos"
+    "nixos-small"
+    "nixos-unstable"
+    "nixos-unstable-small"
+    "unfree"
+    "unstable"
+  ];
 
-  pkgs = map
-    (variant:
-      let
-        pkgs = config.partitions."pkgs-${variant}".extraInputs;
+  pkgs = map (
+    variant:
+    let
+      pkgs = config.partitions."pkgs-${variant}".extraInputs;
 
-        module = {
-          perSystem = { system, ... }: {
+      module = {
+        perSystem =
+          { system, ... }:
+          {
             _module.args.pkgs = builtins.seq pkgs.nixpkgs pkgs.nixpkgs.legacyPackages.${system};
           };
+      };
+    in
+    {
+      inherit variant;
+      component = {
+        inherit module;
+        meta = {
+          description = "Provides access to standard packages by using ${variant} pkgs as the package source, making it available as the pkgs argument across all perSystem configurations";
+          shortDescription = "package set fetched from git repository";
         };
-      in
-      {
-        inherit variant;
-        component = {
-          inherit module;
-          meta = {
-            description = "Provides access to standard packages by using ${variant} pkgs as the package source, making it available as the pkgs argument across all perSystem configurations";
-            shortDescription = "package set fetched from git repository";
-          };
-        };
-      }
-    )
-    variants;
+      };
+    }
+  ) variants;
 in
-builtins.foldl' lib.recursiveUpdate { } (map
-  (pkgs': {
-    flake.components = { nixology.pkgs.${pkgs'.variant} = pkgs'.component; };
-  })
-  pkgs)
+builtins.foldl' lib.recursiveUpdate { } (
+  map (pkgs': {
+    flake.components = {
+      nixology.pkgs.${pkgs'.variant} = pkgs'.component;
+    };
+  }) pkgs
+)

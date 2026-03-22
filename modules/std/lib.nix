@@ -1,4 +1,9 @@
-{ config ? null, inputs, lib ? inputs.flake-parts.inputs.nixpkgs-lib.lib, ... }:
+{
+  config ? null,
+  inputs,
+  lib ? inputs.flake-parts.inputs.nixpkgs-lib.lib,
+  ...
+}:
 let
   flake-schemas = config.partitions.schemas.extraInputs.flake-schemas;
   flake-parts-lib = inputs.flake-parts.lib;
@@ -8,11 +13,11 @@ let
       stdInputs = inputs;
 
       evalFlakeModule =
-        args@
-        { inputs
-        , specialArgs ? { }
-        , self ? inputs.self
-        , moduleLocation ? "${self.outPath}/flake.nix"
+        args@{
+          inputs,
+          specialArgs ? { },
+          self ? inputs.self,
+          moduleLocation ? "${self.outPath}/flake.nix",
         }:
         let
           inputsPos = builtins.unsafeGetAttrPos "inputs" args;
@@ -20,37 +25,46 @@ let
             # Best case: user makes it explicit
             args.moduleLocation or (
               # Slightly worse: Nix does not technically commit to unsafeGetAttrPos semantics
-              if inputsPos != null
-              then inputsPos.file
+              if inputsPos != null then
+                inputsPos.file
               # Slightly worse: self may not be valid when an error occurs
-              else if args?inputs.self.outPath
-              then args.inputs.self.outPath + "/flake.nix"
+              else if args ? inputs.self.outPath then
+                args.inputs.self.outPath + "/flake.nix"
               # Fallback
-              else "<mkFlake argument>"
+              else
+                "<mkFlake argument>"
             );
         in
-        (module:
-        lib.evalModules {
-          specialArgs = {
-            inherit self flake-parts-lib moduleLocation;
-            inputs = args.inputs;
-          } // specialArgs;
-          modules = [ (lib.setDefaultModuleLocation errorLocation module) ] ++
-            lib.optionals (config != null)
-              (with stdInputs.self.components; map (component: component.module) [
+        (
+          module:
+          lib.evalModules {
+            specialArgs = {
+              inherit self flake-parts-lib moduleLocation;
+              inputs = args.inputs;
+            }
+            // specialArgs;
+            modules = [
+              (lib.setDefaultModuleLocation errorLocation module)
+            ]
+            ++ lib.optionals (config != null) (
+              with stdInputs.self.components;
+              map (component: component.module) [
                 nixology.std.default
-              ]);
-          class = "flake";
-        }
+              ]
+            );
+            class = "flake";
+          }
         );
 
-      mkFlake = flakeArgs: flakeModule:
+      mkFlake =
+        flakeArgs: flakeModule:
         let
           eval = evalFlakeModule flakeArgs flakeModule;
         in
         eval.config.flake;
 
-      mkTOMLFlake = flakeArgs: tomlFile:
+      mkTOMLFlake =
+        flakeArgs: tomlFile:
         let
           toml = builtins.fromTOML (builtins.readFile tomlFile);
           args = flakeArgs // {
@@ -64,17 +78,25 @@ let
         in
         mkFlake args module;
 
-      modulesIn = directory: with lib; let
-        moduleFiles =
-          if filesystem.pathIsDirectory directory then
-            (filter (n: strings.hasSuffix ".nix" n) (filesystem.listFilesRecursive directory))
-          else
-            [ ];
-      in
-      moduleFiles;
+      modulesIn =
+        directory:
+        with lib;
+        let
+          moduleFiles =
+            if filesystem.pathIsDirectory directory then
+              (filter (n: strings.hasSuffix ".nix" n) (filesystem.listFilesRecursive directory))
+            else
+              [ ];
+        in
+        moduleFiles;
     in
     {
-      inherit evalFlakeModule mkFlake mkTOMLFlake modulesIn;
+      inherit
+        evalFlakeModule
+        mkFlake
+        mkTOMLFlake
+        modulesIn
+        ;
     };
 
   schema = {
@@ -82,13 +104,15 @@ let
     doc = ''
       The `lib` flake output provides a collection of functions.
     '';
-    inventory = let inherit (flake-schemas.lib) mkChildren; in
-      output: mkChildren (
-        builtins.mapAttrs
-          (name: value: {
-            what = if builtins.isFunction value then "library function" else "library value";
-          })
-          output
+    inventory =
+      let
+        inherit (flake-schemas.lib) mkChildren;
+      in
+      output:
+      mkChildren (
+        builtins.mapAttrs (name: value: {
+          what = if builtins.isFunction value then "library function" else "library value";
+        }) output
       );
   };
 
@@ -111,5 +135,7 @@ in
   flake.lib = library;
   flake.schemas.lib = schema;
 
-  flake.components = { nixology.std.lib = component; };
+  flake.components = {
+    nixology.std.lib = component;
+  };
 }

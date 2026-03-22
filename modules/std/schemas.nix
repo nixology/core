@@ -2,19 +2,23 @@
 let
   flake-schemas = config.partitions.schemas.extraInputs.flake-schemas;
 
-  module = { lib, ... }: {
-    options = with lib; with types;
-      {
-        flake.schemas = mkOption {
-          type = lazyAttrsOf (lazyAttrsOf anything);
-          default = { };
-          description = "Schemas for flake output types.";
+  module =
+    { lib, ... }:
+    {
+      options =
+        with lib;
+        with types;
+        {
+          flake.schemas = mkOption {
+            type = lazyAttrsOf (lazyAttrsOf anything);
+            default = { };
+            description = "Schemas for flake output types.";
+          };
         };
+      config = {
+        flake.schemas = { inherit (flake-schemas.schemas) schemas; };
       };
-    config = {
-      flake.schemas = { inherit (flake-schemas.schemas) schemas; };
     };
-  };
 
   component = {
     inherit module;
@@ -25,5 +29,7 @@ let
 in
 {
   imports = [ module ];
-  flake.components = { nixology.std.schemas = component; };
+  flake.components = {
+    nixology.std.schemas = component;
+  };
 }

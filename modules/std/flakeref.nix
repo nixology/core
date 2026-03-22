@@ -1,17 +1,22 @@
 { config, inputs, ... }:
 let
-  module = { lib, ... }: {
-    options = with lib; with types; let
-      flakeref = mkOption {
-        type = nullOr str;
-        description = "The flake reference for this flake.";
-        default = null;
-      };
-    in
+  module =
+    { lib, ... }:
     {
-      inherit flakeref;
+      options =
+        with lib;
+        with types;
+        let
+          flakeref = mkOption {
+            type = nullOr str;
+            description = "The flake reference for this flake.";
+            default = null;
+          };
+        in
+        {
+          inherit flakeref;
+        };
     };
-  };
 
   component = {
     inherit module;
@@ -22,5 +27,7 @@ let
 in
 {
   imports = [ module ];
-  flake.components = { nixology.std.flakeref = component; };
+  flake.components = {
+    nixology.std.flakeref = component;
+  };
 }

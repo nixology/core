@@ -11,5 +11,7 @@ let
 in
 {
   imports = [ module ];
-  flake.components = { nixology.std.partitions = component; };
+  flake.components = {
+    nixology.std.partitions = component;
+  };
 }

@@ -1,33 +1,44 @@
 { config, lib, ... }:
 let
-  variants = [ "darwin" "nixos" "nixos-small" "nixos-unstable" "nixos-unstable-small" "unfree" "unstable" ];
+  variants = [
+    "darwin"
+    "nixos"
+    "nixos-small"
+    "nixos-unstable"
+    "nixos-unstable-small"
+    "unfree"
+    "unstable"
+  ];
 
-  channels = map
-    (variant:
-      let
-        channel = config.partitions."channels-${variant}".extraInputs;
+  channels = map (
+    variant:
+    let
+      channel = config.partitions."channels-${variant}".extraInputs;
 
-        module = {
-          perSystem = { system, ... }: {
+      module = {
+        perSystem =
+          { system, ... }:
+          {
             _module.args.pkgs = builtins.seq channel.nixpkgs channel.nixpkgs.legacyPackages.${system};
           };
+      };
+    in
+    {
+      inherit variant;
+      component = {
+        inherit module;
+        meta = {
+          description = "Provides access to standard packages by using ${variant} channel as the package source, making it available as the pkgs argument across all perSystem configurations";
+          shortDescription = "package set fetched from channel tarball";
         };
-      in
-      {
-        inherit variant;
-        component = {
-          inherit module;
-          meta = {
-            description = "Provides access to standard packages by using ${variant} channel as the package source, making it available as the pkgs argument across all perSystem configurations";
-            shortDescription = "package set fetched from channel tarball";
-          };
-        };
-      }
-    )
-    variants;
+      };
+    }
+  ) variants;
 in
-builtins.foldl' lib.recursiveUpdate { } (map
-  (channel: {
-    flake.components = { nixology.channels.${channel.variant} = channel.component; };
-  })
-  channels)
+builtins.foldl' lib.recursiveUpdate { } (
+  map (channel: {
+    flake.components = {
+      nixology.channels.${channel.variant} = channel.component;
+    };
+  }) channels
+)
