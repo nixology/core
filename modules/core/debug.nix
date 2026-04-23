@@ -65,6 +65,8 @@ let
   component = {
     inherit module;
     dependencies = with inputs.self.components; [
+      nixology.core.flake
+      nixology.core.perSystem
       nixology.core.schemas
     ];
     meta = {
@@ -72,9 +74,38 @@ let
       shortDescription = "expose debug attributes for the flake";
     };
   };
+
+  checks =
+    { config, ... }:
+    {
+      perSystem =
+        { pkgs, ... }:
+        let
+          eval = config.flake.lib.evalFlakeModule null { inherit inputs; } (
+            with inputs.self.components; nixology.core.debug.module
+          );
+
+          evalWithTrue = config.flake.lib.evalFlakeModule null { inherit inputs; } {
+            imports = [
+              { debug = true; }
+              (with inputs.self.components; nixology.core.debug.module)
+            ];
+          };
+        in
+        {
+          checks.core-debug = pkgs.runCommand "core-debug-check" { } ''
+            : ${builtins.seq eval.config "ok"}
+            : ${builtins.seq evalWithTrue.config "ok"}
+            touch $out
+          '';
+        };
+    };
 in
 {
-  imports = [ module ];
+  imports = [
+    checks
+    module
+  ];
   flake.components = {
     nixology.core.debug = component;
   };
