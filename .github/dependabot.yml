@@ -1,0 +1,78 @@
+version: 2
+updates:
+  - package-ecosystem: "nix"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "nix"
+    directory: "/partitions/channels/darwin"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "nix"
+    directory: "/partitions/channels/nixos"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "nix"
+    directory: "/partitions/channels/nixos-small"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "nix"
+    directory: "/partitions/channels/nixos-unstable"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "nix"
+    directory: "/partitions/channels/nixos-unstable-small"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "nix"
+    directory: "/partitions/channels/unfree"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "nix"
+    directory: "/partitions/channels/unfree/nixpkgs"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "nix"
+    directory: "/partitions/channels/unstable"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "nix"
+    directory: "/partitions/pkgs/darwin"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "nix"
+    directory: "/partitions/pkgs/nixos"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "nix"
+    directory: "/partitions/pkgs/nixos-small"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "nix"
+    directory: "/partitions/pkgs/nixos-unstable"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "nix"
+    directory: "/partitions/pkgs/nixos-unstable-small"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "nix"
+    directory: "/partitions/pkgs/unfree"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "nix"
+    directory: "/partitions/pkgs/unfree/nixpkgs"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "nix"
+    directory: "/partitions/pkgs/unstable"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "nix"
+    directory: "/partitions/schemas"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "nix"
+    directory: "/partitions/systems"
+    schedule:
+      interval: "weekly"
