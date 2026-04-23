@@ -10,9 +10,8 @@ let
 
   library =
     let
-      coreInputs = inputs;
-
       evalFlakeModule =
+        config:
         args@{
           inputs,
           specialArgs ? { },
@@ -47,7 +46,7 @@ let
               (lib.setDefaultModuleLocation errorLocation module)
             ]
             ++ lib.optionals (config != null) (
-              with coreInputs.self.components;
+              with inputs.self.components;
               map (component: component.module) [
                 nixology.core.default
               ]
@@ -59,7 +58,7 @@ let
       mkFlake =
         flakeArgs: flakeModule:
         let
-          eval = evalFlakeModule flakeArgs flakeModule;
+          eval = evalFlakeModule config flakeArgs flakeModule;
         in
         eval.config.flake;
 

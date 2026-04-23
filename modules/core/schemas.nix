@@ -22,6 +22,7 @@ let
 
   component = {
     inherit module;
+    dependencies = with inputs.self.components; [ nixology.core.flake ];
     meta = {
       shortDescription = "flake schemas";
     };
