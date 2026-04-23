@@ -42,6 +42,6 @@ in
 {
   imports = [ module ];
   flake.components = {
-    nixology.std.default = component;
+    nixology.core.default = component;
   };
 }

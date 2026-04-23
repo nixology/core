@@ -28,6 +28,6 @@ in
 {
   imports = [ module ];
   flake.components = {
-    nixology.std.flakeref = component;
+    nixology.core.flakeref = component;
   };
 }

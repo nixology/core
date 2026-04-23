@@ -8,11 +8,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1773325923,
-        "narHash": "sha256-LNBX/SX2tiy93xMsQmc00JU/Y6X0sQHVAkWLkuBkXpE=",
+        "lastModified": 1776522542,
+        "narHash": "sha256-ltx3JsGPlERo61LPQmn1N/cYVOev4ol4DwHECWgMj9k=",
         "owner": "numtide",
         "repo": "nixpkgs-unfree",
-        "rev": "f31a82cd977f12f86d47b44728327d3bfe7deea7",
+        "rev": "d10aa111d8e6a5c4747ce3ce25b857db486dc189",
         "type": "github"
       },
       "original": {
@@ -28,27 +28,27 @@
       },
       "locked": {
         "dir": "partitions/channels/unstable",
-        "lastModified": 1773344001,
-        "narHash": "sha256-pPBrtV5XqjBi+FSPBJ9NWkY2aesZKVO9JSYwXxJDbHE=",
-        "ref": "refs/heads/main",
-        "rev": "1c3571dd943183ccb6843cf58d46dda5c8fda48b",
-        "revCount": 33,
-        "type": "git",
-        "url": "ssh://git@github.com/marksisson/std"
+        "lastModified": 1776954050,
+        "narHash": "sha256-4UDqRWrbU+wQav51+xLFNsaWqA/YnT/Ne+7ZQ1JTMzI=",
+        "owner": "nixology",
+        "repo": "core",
+        "rev": "3e01e50f47f4fbcef92a7a87868d694afd4a4d53",
+        "type": "github"
       },
       "original": {
         "dir": "partitions/channels/unstable",
-        "type": "git",
-        "url": "ssh://git@github.com/marksisson/std"
+        "owner": "nixology",
+        "repo": "core",
+        "type": "github"
       }
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1771207753,
-        "narHash": "sha256-7o+iRF++GO/gGrgrRMlnld2V/3QIzpdwMKViVkHtMEQ=",
-        "rev": "d1c15b7d5806069da59e819999d70e1cec0760bf",
+        "lastModified": 1773201692,
+        "narHash": "sha256-xtsQYO6twTbzxKIvTZcLgZeAkbL5RAcNnJboSjf+E78=",
+        "rev": "b6067cc0127d4db9c26c79e4de0513e58d0c40c9",
         "type": "tarball",
-        "url": "https://releases.nixos.org/nixpkgs/nixpkgs-26.05pre946960.d1c15b7d5806/nixexprs.tar.xz"
+        "url": "https://releases.nixos.org/nixpkgs/nixpkgs-26.05pre961687.b6067cc0127d/nixexprs.tar.xz"
       },
       "original": {
         "type": "tarball",

@@ -30,6 +30,6 @@ in
 {
   imports = [ module ];
   flake.components = {
-    nixology.std.schemas = component;
+    nixology.core.schemas = component;
   };
 }

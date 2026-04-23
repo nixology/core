@@ -12,6 +12,6 @@ in
 {
   imports = [ module ];
   flake.components = {
-    nixology.std.partitions = component;
+    nixology.core.partitions = component;
   };
 }

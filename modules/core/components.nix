@@ -177,8 +177,8 @@ let
   component = {
     inherit module;
     dependencies = with inputs.self.components; [
-      nixology.std.flakeref
-      nixology.std.schemas
+      nixology.core.flakeref
+      nixology.core.schemas
     ];
     meta = {
       description = "Provides a reusable component system for flake modules organized into a structured domain.subdomain.name hierarchy with support for dependencies and metadata";
@@ -189,6 +189,6 @@ in
 {
   imports = [ module ];
   flake.components = {
-    nixology.std.components = component;
+    nixology.core.components = component;
   };
 }

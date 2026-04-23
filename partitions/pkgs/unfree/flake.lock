@@ -45,20 +45,16 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "dir": "partitions/pkgs/unstable",
-        "lastModified": 1774222653,
-        "narHash": "sha256-DRSD+d6GR+QuJuocA3boL6AIKfdMInbAPbrupys2HP0=",
-        "ref": "refs/heads/main",
-        "rev": "1e9d432a07f458411d9446f4dfd0761f478dd73f",
-        "revCount": 40,
-        "type": "git",
-        "url": "ssh://git@github.com/marksisson/std"
+        "path": "../../unstable",
+        "type": "path"
       },
       "original": {
-        "dir": "partitions/pkgs/unstable",
-        "type": "git",
-        "url": "ssh://git@github.com/marksisson/std"
-      }
+        "path": "../../unstable",
+        "type": "path"
+      },
+      "parent": [
+        "nixpkgs"
+      ]
     }
   },
   "root": "root",

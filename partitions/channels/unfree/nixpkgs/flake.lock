@@ -28,18 +28,18 @@
       },
       "locked": {
         "dir": "partitions/channels/unstable",
-        "lastModified": 1774650143,
-        "narHash": "sha256-whqOKBy7tr+I6fboNyVmgSgPdHEk29841BSzDX0RMCQ=",
-        "ref": "refs/heads/main",
-        "rev": "484e42699a35bb3ca30422df17dbe167cdf3ec0a",
-        "revCount": 40,
-        "type": "git",
-        "url": "ssh://git@github.com/marksisson/std"
+        "lastModified": 1776954050,
+        "narHash": "sha256-4UDqRWrbU+wQav51+xLFNsaWqA/YnT/Ne+7ZQ1JTMzI=",
+        "owner": "nixology",
+        "repo": "core",
+        "rev": "3e01e50f47f4fbcef92a7a87868d694afd4a4d53",
+        "type": "github"
       },
       "original": {
         "dir": "partitions/channels/unstable",
-        "type": "git",
-        "url": "ssh://git@github.com/marksisson/std"
+        "owner": "nixology",
+        "repo": "core",
+        "type": "github"
       }
     }
   },

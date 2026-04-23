@@ -5,7 +5,7 @@
 
   outputs =
     inputs:
-    with import ./modules/std/lib.nix { inherit inputs; };
+    with import ./modules/core/lib.nix { inherit inputs; };
     with flake.lib;
     mkFlake { inherit inputs; } { imports = modulesIn ./modules; };
 }

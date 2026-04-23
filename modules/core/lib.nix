@@ -10,7 +10,7 @@ let
 
   library =
     let
-      stdInputs = inputs;
+      coreInputs = inputs;
 
       evalFlakeModule =
         args@{
@@ -47,9 +47,9 @@ let
               (lib.setDefaultModuleLocation errorLocation module)
             ]
             ++ lib.optionals (config != null) (
-              with stdInputs.self.components;
+              with coreInputs.self.components;
               map (component: component.module) [
-                nixology.std.default
+                nixology.core.default
               ]
             );
             class = "flake";
@@ -124,7 +124,7 @@ let
   component = {
     inherit module;
     dependencies = with inputs.self.components; [
-      nixology.std.schemas
+      nixology.core.schemas
     ];
     meta = {
       shortDescription = "library of functions for nixology methodology";
@@ -136,6 +136,6 @@ in
   flake.schemas.lib = schema;
 
   flake.components = {
-    nixology.std.lib = component;
+    nixology.core.lib = component;
   };
 }

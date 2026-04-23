@@ -65,7 +65,7 @@ let
   component = {
     inherit module;
     dependencies = with inputs.self.components; [
-      nixology.std.schemas
+      nixology.core.schemas
     ];
     meta = {
       description = "Expose debug attributes for the flake.";
@@ -76,6 +76,6 @@ in
 {
   imports = [ module ];
   flake.components = {
-    nixology.std.debug = component;
+    nixology.core.debug = component;
   };
 }
