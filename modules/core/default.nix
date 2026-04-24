@@ -9,6 +9,7 @@ let
     inherit module;
     dependencies = with inputs.self.components; [
       nixology.core.flake
+      nixology.core.flakeref
       nixology.core.moduleWithSystem
       nixology.core.perSystem
       nixology.core.pkgs
@@ -27,8 +28,8 @@ let
       perSystem =
         { pkgs, ... }:
         let
-          eval = config.flake.lib.evalFlakeModule null { inherit inputs; } (
-            with inputs.self.components; nixology.core.default.module
+          eval = config.flake.lib.evalComponent { inherit inputs; } (
+            with inputs.self.components; nixology.core.default
           );
         in
         {

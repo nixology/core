@@ -34,8 +34,8 @@ let
       perSystem =
         { pkgs, ... }:
         let
-          eval = config.flake.lib.evalFlakeModule null { inherit inputs; } (
-            with inputs.self.components; nixology.core.schemas.module
+          eval = config.flake.lib.evalComponent { inherit inputs; } (
+            with inputs.self.components; nixology.core.schemas
           );
         in
         {
