@@ -13,6 +13,7 @@ let
       coreInputs = inputs;
 
       evalFlakeModule =
+        config:
         args@{
           inputs,
           specialArgs ? { },
@@ -59,7 +60,7 @@ let
       mkFlake =
         flakeArgs: flakeModule:
         let
-          eval = evalFlakeModule flakeArgs flakeModule;
+          eval = evalFlakeModule config flakeArgs flakeModule;
         in
         eval.config.flake;
 

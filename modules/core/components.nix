@@ -177,7 +177,6 @@ let
   component = {
     inherit module;
     dependencies = with inputs.self.components; [
-      nixology.core.flakeref
       nixology.core.schemas
     ];
     meta = {
@@ -185,9 +184,30 @@ let
       shortDescription = "reusable component system for flake modules";
     };
   };
+
+  checks =
+    { config, ... }:
+    {
+      perSystem =
+        { pkgs, ... }:
+        let
+          eval = config.flake.lib.evalFlakeModule null { inherit inputs; } (
+            with inputs.self.components; nixology.core.components.module
+          );
+        in
+        {
+          checks.core-components = pkgs.runCommand "core-components-check" { } ''
+            : ${builtins.seq eval.config "ok"}
+            touch $out
+          '';
+        };
+    };
 in
 {
-  imports = [ module ];
+  imports = [
+    checks
+    module
+  ];
   flake.components = {
     nixology.core.components = component;
   };
