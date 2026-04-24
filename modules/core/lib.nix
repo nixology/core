@@ -129,8 +129,28 @@ let
       shortDescription = "library of functions for nixology methodology";
     };
   };
+
+  checks =
+    { config, ... }:
+    {
+      perSystem =
+        { pkgs, ... }:
+        let
+          eval = config.flake.lib.evalFlakeModule null { inherit inputs; } (
+            with inputs.self.components; nixology.core.lib.module
+          );
+        in
+        {
+          checks.core-lib = pkgs.runCommandLocal "core-lib-check" { } ''
+            : ${builtins.seq eval.config "ok"}
+            touch $out
+          '';
+        };
+    };
 in
 {
+  imports = [ checks ];
+
   flake.lib = library;
   flake.schemas.lib = schema;
 

@@ -27,9 +27,30 @@ let
       shortDescription = "flake schemas";
     };
   };
+
+  checks =
+    { config, ... }:
+    {
+      perSystem =
+        { pkgs, ... }:
+        let
+          eval = config.flake.lib.evalFlakeModule null { inherit inputs; } (
+            with inputs.self.components; nixology.core.schemas.module
+          );
+        in
+        {
+          checks.core-schemas = pkgs.runCommandLocal "core-schemas-check" { } ''
+            : ${builtins.seq eval.config "ok"}
+            touch $out
+          '';
+        };
+    };
 in
 {
-  imports = [ module ];
+  imports = [
+    checks
+    module
+  ];
   flake.components = {
     nixology.core.schemas = component;
   };

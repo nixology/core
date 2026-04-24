@@ -15,13 +15,38 @@ let
 
   component = {
     inherit module;
+    dependencies = with inputs.self.components; [
+      nixology.core.flake
+      nixology.core.perSystem
+    ];
     meta = {
       shortDescription = "flake-parts transposition component";
     };
   };
+
+  checks =
+    { config, ... }:
+    {
+      perSystem =
+        { pkgs, ... }:
+        let
+          eval = config.flake.lib.evalFlakeModule null { inherit inputs; } (
+            with inputs.self.components; nixology.core.transposition.module
+          );
+        in
+        {
+          checks.core-transposition = pkgs.runCommandLocal "core-transposition-check" { } ''
+            : ${builtins.seq eval.config "ok"}
+            touch $out
+          '';
+        };
+    };
 in
 {
-  imports = [ module ];
+  imports = [
+    checks
+    module
+  ];
   flake.components = {
     nixology.core.transposition = component;
   };
