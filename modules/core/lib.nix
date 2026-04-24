@@ -10,6 +10,8 @@ let
 
   library =
     let
+      evalComponent = args: component: evalFlakeModule null args component.module;
+
       evalFlakeModule =
         config:
         args@{
@@ -91,6 +93,7 @@ let
     in
     {
       inherit
+        evalComponent
         evalFlakeModule
         mkFlake
         mkTOMLFlake
@@ -136,8 +139,8 @@ let
       perSystem =
         { pkgs, ... }:
         let
-          eval = config.flake.lib.evalFlakeModule null { inherit inputs; } (
-            with inputs.self.components; nixology.core.lib.module
+          eval = config.flake.lib.evalComponent { inherit inputs; } (
+            with inputs.self.components; nixology.core.lib
           );
         in
         {
