@@ -83,15 +83,17 @@ let
       perSystem =
         { pkgs, ... }:
         let
-          evalModule = module: config.flake.lib.evalFlakeModule null { inherit inputs; } module;
+          evalComponent = component: config.flake.lib.evalComponent { inherit inputs; } component;
 
-          eval = evalModule (with inputs.self.components; nixology.core.debug.module);
+          eval = evalComponent (with inputs.self.components; nixology.core.debug);
 
-          evalWithTrue = evalModule {
-            imports = [
-              { debug = true; }
-              (with inputs.self.components; nixology.core.debug.module)
-            ];
+          evalWithTrue = evalComponent {
+            module = {
+              imports = [
+                { debug = true; }
+                (with inputs.self.components; nixology.core.debug.module)
+              ];
+            };
           };
         in
         {
