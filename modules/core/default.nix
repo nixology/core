@@ -1,7 +1,5 @@
 {
-  config,
   inputs,
-  lib,
   ...
 }:
 let
@@ -22,9 +20,27 @@ let
       shortDescription = "default module for nixology";
     };
   };
+
+  checks =
+    { config, ... }:
+    {
+      perSystem =
+        { pkgs, ... }:
+        let
+          eval = config.flake.lib.evalFlakeModule null { inherit inputs; } (
+            with inputs.self.components; nixology.core.default.module
+          );
+        in
+        {
+          checks.core-default = pkgs.runCommandLocal "core-default-check" { } ''
+            : ${builtins.seq eval.config "ok"}
+            touch $out
+          '';
+        };
+    };
 in
 {
-  imports = [ module ];
+  imports = [ checks ];
   flake.components = {
     nixology.core.default = component;
   };

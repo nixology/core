@@ -57,6 +57,8 @@ let
                 _resolved = mkOption {
                   type = bool;
                   default = false;
+                  description = "Internal flag. Do not set manually.";
+                  visible = false;
                 };
               };
               config = {
@@ -106,7 +108,7 @@ let
                 };
                 freeformType = lazyAttrsOf (unique { inherit message; } raw);
               });
-              default = null;
+              default = { };
               description = ''
                 Metadata about the component. Any attribute can be set here, but some attributes
                 are represented by options, to provide appropriate configuration merging.
@@ -156,7 +158,7 @@ let
                         if (lib.isAttrs attrs && (attrs ? module && attrs ? _resolved)) then
                           {
                             what =
-                              if (attrs ? meta && attrs.meta ? shortDescription && attrs.meta.shortDescription != null) then
+                              if ((attrs.meta.shortDescription or null) != null) then
                                 "component (${attrs.meta.shortDescription})"
                               else
                                 "component";
@@ -196,7 +198,7 @@ let
           );
         in
         {
-          checks.core-components = pkgs.runCommand "core-components-check" { } ''
+          checks.core-components = pkgs.runCommandLocal "core-components-check" { } ''
             : ${builtins.seq eval.config "ok"}
             touch $out
           '';

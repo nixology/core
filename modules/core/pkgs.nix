@@ -18,13 +18,35 @@ let
 
   component = {
     inherit module;
+    dependencies = with inputs.self.components; [ nixology.core.perSystem ];
     meta = {
       shortDescription = "default pkgs";
     };
   };
+
+  checks =
+    { config, ... }:
+    {
+      perSystem =
+        { pkgs, ... }:
+        let
+          eval = config.flake.lib.evalFlakeModule null { inherit inputs; } (
+            with inputs.self.components; nixology.core.pkgs.module
+          );
+        in
+        {
+          checks.core-pkgs = pkgs.runCommandLocal "core-pkgs-check" { } ''
+            : ${builtins.seq eval.config "ok"}
+            touch $out
+          '';
+        };
+    };
 in
 {
-  imports = [ module ];
+  imports = [
+    checks
+    module
+  ];
   flake.components = {
     nixology.core.pkgs = component;
   };

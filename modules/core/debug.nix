@@ -5,9 +5,11 @@
   ...
 }:
 let
-  flake-schemas = config.partitions.schemas.extraInputs.flake-schemas;
-
   module =
+    let
+      flake-schemas = config.partitions.schemas.extraInputs.flake-schemas;
+      inherit (flake-schemas.lib) mkChildren;
+    in
     { config, ... }:
     {
       imports = [
@@ -17,11 +19,11 @@ let
       config = lib.mkIf config.debug {
         flake.schemas =
           let
-            inherit (flake-schemas.lib) mkChildren;
+            version = 1;
           in
           {
             allSystems = {
-              version = 1;
+              inherit version;
               doc = ''
                 The `allSystems` flake output provides the perSystem flake-parts configuration.
                 An attribute set of configured systems, each consisting of the `perSystem` attributes, plus the extra attributes `_module`, `config`, `options`, `extendModules`.
@@ -37,7 +39,7 @@ let
             };
 
             debug = {
-              version = 1;
+              inherit version;
               doc = ''
                 The `debug` flake output provides the top-level flake-parts configuration.
                 An attribute set consisting of the `config` attributes, plus the extra attributes `_module`, `config`, `options`, `extendModules`.
@@ -47,12 +49,12 @@ let
             };
 
             currentSystem = {
-              version = 1;
+              inherit version;
               doc = ''
                 The `currentSystem` flake output provides the perSystem flake-parts configuration for the current system.
                 An attribute set consisting of the `perSystem` attributes, plus the extra attributes `_module`, `config`, `options`, `extendModules`.
                 N.B. these are not part of the `config` parameter, but are merged in for debugging convenience.
-                Only avaiable in impure mode.
+                Only available in impure mode.
               '';
               inventory = output: {
                 what = "perSystem flake-parts configuration for ${output.allModuleArgs.system}";
@@ -81,11 +83,11 @@ let
       perSystem =
         { pkgs, ... }:
         let
-          eval = config.flake.lib.evalFlakeModule null { inherit inputs; } (
-            with inputs.self.components; nixology.core.debug.module
-          );
+          evalModule = module: config.flake.lib.evalFlakeModule null { inherit inputs; } module;
 
-          evalWithTrue = config.flake.lib.evalFlakeModule null { inherit inputs; } {
+          eval = evalModule (with inputs.self.components; nixology.core.debug.module);
+
+          evalWithTrue = evalModule {
             imports = [
               { debug = true; }
               (with inputs.self.components; nixology.core.debug.module)
@@ -93,7 +95,7 @@ let
           };
         in
         {
-          checks.core-debug = pkgs.runCommand "core-debug-check" { } ''
+          checks.core-debug = pkgs.runCommandLocal "core-debug-check" { } ''
             : ${builtins.seq eval.config "ok"}
             : ${builtins.seq evalWithTrue.config "ok"}
             touch $out
