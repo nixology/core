@@ -28,11 +28,11 @@
       },
       "locked": {
         "dir": "partitions/channels/unstable",
-        "lastModified": 1776955896,
-        "narHash": "sha256-Pyr293OhFOqNeJvEF0c0NgI2KwPGSxikzIRKNs2dzrs=",
+        "lastModified": 1777038777,
+        "narHash": "sha256-5uMUNLSQOk23S5q68SfZVbeB9sv57JyL0sZdLSwMVlo=",
         "owner": "nixology",
         "repo": "core",
-        "rev": "9fe2cf21618b44d1417fba2b34cfab83e9a9f093",
+        "rev": "24ae733da36ad7a1ca6539930e80292c471c4da2",
         "type": "github"
       },
       "original": {
