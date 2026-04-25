@@ -1,11 +1,12 @@
 {
   config,
   inputs,
-  moduleLocation,
   ...
 }:
 let
   flake-schemas = config.partitions.schemas.extraInputs.flake-schemas;
+
+  moduleLocation = "${inputs.self.outPath}/flake.nix";
 
   module =
     { config, lib, ... }:

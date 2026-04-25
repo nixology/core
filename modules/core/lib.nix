@@ -42,7 +42,7 @@ let
           module:
           lib.evalModules {
             specialArgs = {
-              inherit self flake-parts-lib moduleLocation;
+              inherit self flake-parts-lib;
               inputs = args.inputs;
             }
             // specialArgs;
