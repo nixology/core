@@ -1,4 +1,4 @@
-name: CI
+name: Nix flake check
 
 on:
   pull_request:
