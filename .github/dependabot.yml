@@ -10,4 +10,4 @@ updates:
       - /
       - /partitions/**/*
     schedule:
-      interval: weekly
+      interval: daily
