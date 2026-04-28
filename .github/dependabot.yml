@@ -4,6 +4,8 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
 
   - package-ecosystem: nix
     directories:
@@ -11,3 +13,5 @@ updates:
       - /partitions/**/*
     schedule:
       interval: daily
+    cooldown:
+      default-days: 7
