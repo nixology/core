@@ -20,9 +20,9 @@ let
       implementation = {
         systems =
           if variant == "default" then
-            local.lib.mkOptionDefault (import extraInputs.${variant})
+            local.lib.mkOptionDefault (local.lib.filter (x: x != "x86_64-darwin") (import extraInputs.${variant}))
           else
-            import extraInputs.${variant};
+            local.lib.filter (x: x != "x86_64-darwin") (import extraInputs.${variant});
       };
     in
     {
