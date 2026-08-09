@@ -32,6 +32,7 @@ in
       dependencies = [
         nixology.core.flake
         nixology.core.flakeref
+        nixology.core.moduleClasses
         nixology.core.moduleWithSystem
         nixology.core.perSystem
         nixology.core.pkgs
