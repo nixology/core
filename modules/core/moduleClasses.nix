@@ -27,15 +27,13 @@ let
         perSystem = { pkgs, ... }: {
           checks =
             let
-              inherit
-                (evalComponent { inherit (module) inputs; } nixology.core.moduleClasses)
+              inherit (evalComponent { inherit (module) inputs; } nixology.core.moduleClasses)
                 config
                 ;
             in
             {
               nixology-core-moduleClasses = pkgs.runCommandLocal "checks" {
-                check_module_classes =
-                  builtins.seq config.moduleClasses "ok";
+                check_module_classes = builtins.seq config.moduleClasses "ok";
               } "touch $out";
             };
         };
