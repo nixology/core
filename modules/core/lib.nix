@@ -7,6 +7,7 @@ let
   inherit (local.inputs.self.components) nixology;
 
   inherit (lib)
+    extend
     filter
     getAttrFromPath
     makeExtensible
@@ -32,18 +33,19 @@ let
     splitString
     ;
 
-  flake-parts-lib = import "${local.inputs.flake-parts}/lib.nix" {
-    lib = lib.extend (final: prev: library);
-    builtinModules = { };
-    extraModules = { };
-  };
-
-  inherit (flake-parts-lib)
-    evalFlakeModule
-    ;
-
   library =
+    config:
     let
+      flake-parts-lib = import "${local.inputs.flake-parts}/lib.nix" {
+        lib = extend (final: prev: library config);
+        builtinModules = { };
+        extraModules = { };
+      };
+
+      inherit (flake-parts-lib)
+        evalFlakeModule
+        ;
+
       getFileStem =
         filePath:
         let
@@ -171,7 +173,7 @@ let
   implementation =
     { ... }@module:
     {
-      flake.lib = mkDefault (makeExtensible (final: library));
+      flake.lib = mkDefault (makeExtensible (final: library module.config));
       flake.schemas = { inherit (local.config.flake.exportedSchemas) lib; };
 
       perSystem = { pkgs, ... }: {
@@ -202,7 +204,7 @@ in
 
   # provide `flake.lib` attribute for core bootstrap import
   flake = {
-    ${if config == null then "lib" else null} = library;
+    ${if config == null then "lib" else null} = library config;
   };
 
   flake.components = {
