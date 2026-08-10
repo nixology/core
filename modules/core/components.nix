@@ -229,9 +229,9 @@ in
       ];
 
       meta = {
-        shortDescription = "reusable component system for flake modules";
+        shortDescription = "reusable component system for modules";
         description = ''
-          Provides a reusable component system for flake modules organized into a
+          Provides a reusable component system for modules organized into a
           structured domain.subdomain.name hierarchy with support for dependencies
           and metadata.
         '';
