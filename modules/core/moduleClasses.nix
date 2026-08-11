@@ -1,62 +1,55 @@
-{ ... }@local:
+{ lib, inputs, ... }:
 let
-  inherit (local.inputs.self.components) nixology;
-
-  implementation =
-    { ... }@module:
-    let
-      inherit (local.lib) mkOption;
-      inherit (local.lib.components) evalComponent;
-      inherit (local.lib.types) listOf str;
-    in
+  flake =
     {
-      options = {
-        moduleClasses = mkOption {
-          type = listOf str;
-          default = [
-            "flake"
-            "homeManager"
-            "nixos"
-            "darwin"
-          ];
-          description = "Module classes supported by components.";
+      config,
+      inputs,
+      lib,
+      ...
+    }:
+    {
+      options =
+        with lib;
+        with types;
+        {
+          moduleClasses = mkOption {
+            type = listOf str;
+            default = [
+              "flake"
+              "homeManager"
+              "nixos"
+              "darwin"
+            ];
+            description = "Module classes supported by components.";
+          };
         };
-      };
 
       config = {
         perSystem = { pkgs, ... }: {
-          checks =
-            let
-              inherit (evalComponent { inherit (module) inputs; } nixology.core.moduleClasses)
-                config
-                ;
-            in
-            {
-              nixology-core-moduleClasses = pkgs.runCommandLocal "checks" {
-                check_module_classes = builtins.seq config.moduleClasses "ok";
-              } "touch $out";
-            };
+          checks = {
+            nixology-core-moduleClasses =
+              let
+                unsupportedModuleClasses = builtins.filter (name: !(builtins.elem name config.moduleClasses)) (
+                  builtins.attrNames (config.flake.modules or { })
+                );
+              in
+              assert lib.assertMsg (unsupportedModuleClasses == [ ])
+                "flake.modules contains unsupported module classes: ${builtins.concatStringsSep ", " unsupportedModuleClasses}";
+              pkgs.runCommandLocal "checks" { } "touch $out";
+          };
         };
       };
     };
 in
-{
-  imports = [
-    implementation
+lib.mkComponent __curPos.file {
+  modules = { inherit flake; };
+
+  dependencies = with inputs.self.components; [
+    nixology.core.perSystem
   ];
 
-  flake.components = {
-    nixology.core.moduleClasses = {
-      inherit implementation;
-
-      dependencies = [
-        nixology.core.perSystem
-      ];
-
-      meta = {
-        description = "Configure module classes supported by components.";
-        shortDescription = "valid module classes";
-      };
-    };
+  meta = {
+    description = "Configure module classes supported by components.";
+    shortDescription = "valid module classes";
   };
 }

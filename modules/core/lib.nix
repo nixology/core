@@ -81,10 +81,15 @@ let
           dependencies ? [ ],
           domain ? null,
           subdomain ? null,
+          meta ? { },
         }:
         let
           implementation =
-            { config, lib, ... }:
+            {
+              config,
+              lib,
+              ...
+            }@args:
             let
               inherit (config) flakeref;
 
@@ -94,7 +99,7 @@ let
                 let
                   match = builtins.match "([a-zA-Z0-9+.-]+):([^/]+)/([^/?#]+)(/([^?#]+))?(\\?.*)?" flakeref;
                 in
-                if match == null then
+                if flakeref == null || match == null then
                   null
                 else
                   {
@@ -110,7 +115,7 @@ let
                 else if flakerefComponents != null then
                   flakerefComponents.owner
                 else
-                  abort "Unable to determine component domain from flake reference: ${flakeref}";
+                  abort "Unable to determine component domain.";
 
               componentSubdomain =
                 if subdomain != null then
@@ -118,12 +123,12 @@ let
                 else if flakerefComponents != null then
                   getFileStem flakerefComponents.repo
                 else
-                  abort "Unable to determine component subdomain from flake reference: ${flakeref}";
+                  abort "Unable to determine component subdomain.";
 
               featureModule = modules.flake or null;
               targetModules = removeAttrs modules [ "flake" ];
 
-              featureTargetModules =
+              featureTargetsModule =
                 if builtins.attrNames targetModules == [ ] then
                   null
                 else
@@ -132,26 +137,27 @@ let
                       ${componentName} = {
                         key = "${flakeref}#components.${componentName}";
                         imports = [ module ];
-                        _class = class;
                       };
                     }) targetModules;
                   };
+
+              module = {
+                imports =
+                  optional (featureModule != null) featureModule
+                  ++ optional (featureTargetsModule != null) featureTargetsModule;
+              };
             in
             {
-              imports = [
-                nixology.core.flake.module
-                nixology.core.modules.module
-              ]
-              ++ optional (featureModule != null) featureModule
-              ++ optional (featureTargetModules != null) featureTargetModules;
+              imports = [ module ];
 
-              flake.components.${componentDomain}.${componentSubdomain}.${componentName} =
-                assert lib.assertMsg (lib.all (name: builtins.elem name config.moduleClasses) (
-                  builtins.attrNames modules
-                )) "modules contains an unsupported module class";
-                {
-                  inherit implementation dependencies;
-                };
+              flake.components.${componentDomain}.${componentSubdomain}.${componentName} = {
+                implementation = module;
+                dependencies = dependencies ++ [
+                  nixology.core.modules
+                  nixology.core.components
+                ];
+                inherit meta;
+              };
             };
         in
         {
