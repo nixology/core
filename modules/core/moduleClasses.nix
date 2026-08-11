@@ -41,13 +41,10 @@ let
       };
     };
 in
-lib.mkComponent __curPos.file {
+lib.mkComponent {
+  name = lib.basename __curPos.file;
   modules = { inherit flake; };
-
-  dependencies = with inputs.self.components; [
-    nixology.core.perSystem
-  ];
-
+  dependencies = with inputs.self.components; [ nixology.core.perSystem ];
   meta = {
     description = "Configure module classes supported by components.";
     shortDescription = "valid module classes";

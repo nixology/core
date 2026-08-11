@@ -76,8 +76,8 @@ let
       evalComponent = args: component: evalFlakeModule args component.module;
 
       mkComponent =
-        nameOrSource:
         {
+          name,
           modules ? { },
           dependencies ? [ ],
           domain ? null,
@@ -94,7 +94,7 @@ let
             let
               inherit (config) flakeref;
 
-              componentName = basename nameOrSource;
+              componentName = basename name;
 
               flakerefComponents =
                 let

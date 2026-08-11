@@ -13,7 +13,8 @@ let
       };
   };
 in
-lib.mkComponent __curPos.file {
+lib.mkComponent {
+  name = lib.basename __curPos.file;
   modules = { inherit flake; };
   meta = {
     description = "Provide a unique identifier for the flake.";
