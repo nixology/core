@@ -48,13 +48,14 @@ let
         evalFlakeModule
         ;
 
-      getFileStem =
-        filePath:
+      basename =
+        url:
         let
-          baseName = builtins.baseNameOf filePath;
-          stem = builtins.match "(.+)\\.[^.]+$" baseName;
+          components = splitString "/" url;
+          filename = lib.last components;
+          parts = splitString "." filename;
         in
-        if stem == null then baseName else builtins.head stem;
+        head parts;
 
       uses =
         {
@@ -93,7 +94,7 @@ let
             let
               inherit (config) flakeref;
 
-              componentName = getFileStem nameOrSource;
+              componentName = basename nameOrSource;
 
               flakerefComponents =
                 let
@@ -121,7 +122,7 @@ let
                 if subdomain != null then
                   subdomain
                 else if flakerefComponents != null then
-                  getFileStem flakerefComponents.repo
+                  basename flakerefComponents.repo
                 else
                   abort "Unable to determine component subdomain.";
 
@@ -231,7 +232,7 @@ let
     in
     {
       inherit
-        getFileStem
+        basename
         evalComponent
         metadataForFlakeInput
         mkComponent
