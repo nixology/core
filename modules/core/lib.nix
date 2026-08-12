@@ -80,7 +80,7 @@ let
           meta ? { },
         }:
         let
-          implementation =
+          component =
             { config, ... }:
             let
               inherit (config) flakeref;
@@ -133,23 +133,22 @@ let
                     }) targetModules;
                   };
 
-              module = {
+              implementation = {
                 imports =
                   optional (featureModule != null) featureModule
                   ++ optional (featureTargetsModule != null) featureTargetsModule;
               };
             in
             {
-              imports = [ module ];
+              imports = [ implementation ];
 
               flake.components.${componentDomain}.${componentSubdomain}.${componentName} = {
-                implementation = module;
-                inherit dependencies meta;
+                inherit implementation dependencies meta;
               };
             };
         in
         {
-          imports = [ implementation ];
+          imports = [ component ];
         };
 
       mkFlake =
