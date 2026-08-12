@@ -138,12 +138,18 @@ let
                   optional (featureModule != null) featureModule
                   ++ optional (featureTargetsModule != null) featureTargetsModule;
               };
+
+              componentDependencies = let
+                coreref = (import "${local.inputs.self}/modules/flakeref.nix").flakeref;
+              in
+                dependencies ++ lib.optional (flakeref != coreref) nixology.core.components;
             in
             {
               imports = [ implementation ];
 
               flake.components.${componentDomain}.${componentSubdomain}.${componentName} = {
-                inherit implementation dependencies meta;
+                inherit implementation meta;
+                dependencies = componentDependencies;
               };
             };
         in

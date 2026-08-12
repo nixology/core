@@ -33,6 +33,7 @@ let
   moduleLocation = "${inputs.self.outPath}/flake.nix";
 
   flake =
+    args:
     let
       undeclaredMetaMessage = ''
         No option has been declared for this attribute, so its definitions can't be merged automatically.
@@ -195,6 +196,29 @@ let
       };
 
       config = {
+        perSystem = { pkgs, ... }: {
+          checks =
+            let
+              configs = builtins.listToAttrs (
+                map ({ name, value }: {
+                  inherit name;
+                  value = (evalComponent { inherit (args) inputs; } value).config;
+                }) (componentsFrom args.config.flake.components)
+              );
+
+              inherit (evalComponent { inherit (args) inputs; } nixology.core.components) config;
+            in
+            {
+              components = pkgs.runCommandLocal "checks" (builtins.mapAttrs (
+                _: config: builtins.seq config "ok"
+              ) configs) "touch $out";
+
+              nixology-core-components = pkgs.runCommandLocal "checks" {
+                check_flake_components = builtins.seq config.flake.components "ok";
+              } "touch $out";
+            };
+        };
+
         flake.schemas = { inherit (config.flake.exportedSchemas) components; };
       };
     };
@@ -205,6 +229,7 @@ lib.mkComponent {
   modules = { inherit flake; };
 
   dependencies = [
+    nixology.core.flake
     nixology.core.perSystem
     nixology.core.schemas
   ];

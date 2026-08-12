@@ -15,7 +15,10 @@ lib.mkComponent {
 
   modules = { inherit flake; };
 
-  dependencies = with inputs.self.components; [ nixology.core.flake ];
+  dependencies = with inputs.self.components; [
+    nixology.core.flake
+    nixology.core.perSystem
+  ];
 
   meta = {
     description = "Expose the upstream flake-parts transposition module as a nixology component.";
