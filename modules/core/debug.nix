@@ -25,8 +25,6 @@ lib.mkComponent {
 
   dependencies = with inputs.self.components; [
     nixology.core.flake
-    nixology.core.perSystem
-    nixology.core.schemas
   ];
 
   meta = {

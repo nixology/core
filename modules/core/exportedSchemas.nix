@@ -32,7 +32,6 @@ lib.mkComponent {
   modules = { inherit flake; };
 
   dependencies = with inputs.self.components; [
-    nixology.core.perSystem
     nixology.core.schemas
   ];
 

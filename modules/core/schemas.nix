@@ -31,8 +31,6 @@ lib.mkComponent {
 
   modules = { inherit flake; };
 
-  dependencies = with inputs.self.components; [ nixology.core.flake ];
-
   meta = {
     description = "Flake schemas used by this flake.";
     shortDescription = "flake schemas used by this flake";

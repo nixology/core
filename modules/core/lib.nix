@@ -142,7 +142,10 @@ let
               componentDependencies = let
                 coreref = (import "${local.inputs.self}/modules/flakeref.nix").flakeref;
               in
-                dependencies ++ lib.optional (flakeref != coreref) nixology.core.components;
+                dependencies ++ lib.optionals (flakeref != coreref) [
+                  nixology.core.components
+                  nixology.core.modules
+                ];
             in
             {
               imports = [ implementation ];
@@ -294,7 +297,6 @@ in
 
       dependencies = [
         nixology.core.perSystem
-        nixology.core.schemas
         nixology.extra.touchup
       ];
 
