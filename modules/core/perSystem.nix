@@ -1,26 +1,14 @@
-{ ... }@local:
+{ inputs, lib, ... }:
 let
-  inherit (local.inputs.self.components) nixology;
-
-  implementation = {
-    imports = [
-      "${local.inputs.flake-parts}/modules/perSystem.nix"
-    ];
-  };
+  flake = "${inputs.flake-parts}/modules/perSystem.nix";
 in
-{
-  imports = [
-    implementation
-  ];
+lib.mkComponent {
+  name = lib.basename __curPos.file;
 
-  flake.components = {
-    nixology.core.perSystem = {
-      inherit implementation;
+  modules = { inherit flake; };
 
-      meta = {
-        description = "Expose the upstream flake-parts perSystem module as a nixology component.";
-        shortDescription = "flake-parts perSystem component";
-      };
-    };
+  meta = {
+    description = "Expose the upstream flake-parts perSystem module as a nixology component.";
+    shortDescription = "flake-parts perSystem component";
   };
 }

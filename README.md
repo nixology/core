@@ -9,8 +9,7 @@ This repository exports:
 | `lib` | Helper functions such as `mkFlake`, `evalFlakeModule`, `evalComponent`, `mkTOMLFlake`, and `modulesIn` |
 | `components.nixology.core.*` | Core components like `default`, `flake`, `perSystem`, `withSystem`, `systems`, `pkgs`, `partitions`, `lib`, and `pkgsUnfree` |
 | `components.nixology.channels.*` | `pkgs` providers backed by Nix channel tarballs |
-| `components.nixology.branches.*` | `pkgs` providers backed by `github:nixos/nixpkgs` refs |
-| `components.nixology.systems.*` | Predefined system sets such as `default`, `default-darwin`, `default-linux`, `aarch64-linux`, and `x86_64-darwin` |
+| `components.nixology.systems.*` | Predefined system sets such as `default`, `default-darwin`, `default-linux`, and `aarch64-linux` |
 | `schemas` | Flake schemas for `lib`, `components`, `checks`, `formatter`, and `schemas` |
 | `formatter` | Formatter wrapping `nixfmt`, `deadnix`, `yamlfmt`, and `zizmor` via `treefmt` |
 | `checks` | Evaluation checks for the exported components |
@@ -23,7 +22,8 @@ The root flake assembles modules under `modules/` into a component catalog organ
 components.<domain>.<subdomain>.<name>
 ```
 
-Each component carries metadata, a module, and optional dependencies. The resolved module for a component imports its dependencies automatically, which makes components usable as building blocks in downstream flakes.
+Each component carries metadata, a module, and optional dependencies. The resolved module imports its dependencies
+automatically, making components usable as building blocks in downstream flakes.
 
 ## Usage
 
@@ -64,10 +64,6 @@ Package-set components sourced from channel tarballs:
 - `nixpkgs-darwin`
 - `nixpkgs-unstable`
 
-### `nixology.branches`
-
-Package-set components sourced from `github:nixos/nixpkgs` refs, with the same variants as `nixology.channels`.
-
 ### `nixology.systems`
 
 Prebuilt system lists:
@@ -77,7 +73,6 @@ Prebuilt system lists:
 - `default-linux`
 - `aarch64-darwin`
 - `aarch64-linux`
-- `x86_64-darwin`
 - `x86_64-linux`
 
 ## Repository layout
@@ -85,7 +80,7 @@ Prebuilt system lists:
 ```text
 modules/     Root modules assembled into the exported flake
 modules/core Core component implementations and library helpers
-partitions/  Input-only flakes used for branches, channels, schemas, and systems
+partitions/  Input-only flakes used for channels, schemas, and systems
 justfile     Project maintenance commands
 ```
 

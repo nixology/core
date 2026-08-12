@@ -1,33 +1,38 @@
-{ ... }@local:
+{
+  config,
+  inputs,
+  lib,
+  ...
+}:
 let
-  inherit (local.inputs.self.components) nixology;
+  inherit (config) flakeref;
 
-  implementation =
-    let
-      inherit (local.lib)
-        isAttrs
-        mkDefault
-        mkOption
-        optionalString
-        ;
+  inherit (inputs.self.components) nixology;
 
-      inherit (local.lib.components) evalComponent;
+  inherit (lib)
+    isAttrs
+    mkDefault
+    mkOption
+    optionalString
+    ;
 
-      inherit (local.lib.types)
-        addCheck
-        deferredModule
-        lazyAttrsOf
-        listOf
-        nonEmptyStr
-        nullOr
-        raw
-        submodule
-        unique
-        ;
+  inherit (lib.components) evalComponent;
 
-      moduleLocation = "${local.inputs.self.outPath}/flake.nix";
-    in
-    { ... }@module:
+  inherit (lib.types)
+    addCheck
+    deferredModule
+    lazyAttrsOf
+    listOf
+    nonEmptyStr
+    nullOr
+    raw
+    submodule
+    unique
+    ;
+
+  moduleLocation = "${inputs.self.outPath}/flake.nix";
+
+  flake =
     let
       undeclaredMetaMessage = ''
         No option has been declared for this attribute, so its definitions can't be merged automatically.
@@ -45,7 +50,7 @@ let
       componentType =
         { domain, subdomain }:
         submodule (
-          { name, ... }@args:
+          { config, name, ... }:
           {
             options = {
               dependencies = mkOption {
@@ -59,7 +64,7 @@ let
                   options = {
                     name = mkOption {
                       type = nonEmptyStr;
-                      default = args.name;
+                      default = name;
                       description = "The name of the component.";
                     };
 
@@ -104,26 +109,29 @@ let
                 description = "The fully resolved component module including dependencies.";
                 apply =
                   _:
-                  local.lib.throwIfNot (local.config.flakeref != null)
-                    "nixology: `flakeref` must be set before components can be used. Add `flakeref = \"github:your-org/your-repo\";` to your flake module."
+                  lib.throwIfNot (flakeref != null)
+                    (
+                      "nixology: `flakeref` must be set before components can be used. "
+                      + "Add `flakeref = \"github:your-org/your-repo\";` to your flake module."
+                    )
                     {
                       key =
-                        "${local.config.flakeref}#components.${domain}.${subdomain}.${args.config.meta.name}"
-                        + optionalString (args.config.meta.version != null) ".${args.config.meta.version}";
+                        "${flakeref}#components.${domain}.${subdomain}.${config.meta.name}"
+                        + optionalString (config.meta.version != null) ".${config.meta.version}";
 
                       imports = [
-                        args.config.implementation
+                        config.implementation
                       ]
-                      ++ map (dependency: dependency.module) args.config.dependencies;
+                      ++ map (dependency: dependency.module) config.dependencies;
 
                       _class = "flake";
-                      _file = "${moduleLocation}#components.${domain}.${subdomain}.${args.config.meta.name}";
+                      _file = "${moduleLocation}#components.${domain}.${subdomain}.${config.meta.name}";
                     };
               };
             };
 
             config = {
-              meta.name = mkDefault args.name;
+              meta.name = mkDefault name;
             };
           }
         );
@@ -131,19 +139,19 @@ let
       subdomainType =
         domain:
         submodule (
-          { name, ... }@args:
+          { name, ... }:
           {
             freeformType = lazyAttrsOf (componentType {
               inherit domain;
-              subdomain = args.name;
+              subdomain = name;
             });
           }
         );
 
       domainType = submodule (
-        { name, ... }@args:
+        { name, ... }:
         {
-          freeformType = lazyAttrsOf (subdomainType args.name);
+          freeformType = lazyAttrsOf (subdomainType name);
         }
       );
 
@@ -164,7 +172,7 @@ let
                       [
                         {
                           name = builtins.concatStringsSep "." newPath;
-                          value = value;
+                          inherit value;
                         }
                       ]
                     else
@@ -187,55 +195,26 @@ let
       };
 
       config = {
-        flake.schemas = { inherit (local.config.flake.exportedSchemas) components; };
-
-        perSystem = { pkgs, ... }: {
-          checks =
-            let
-              configs = builtins.listToAttrs (
-                map ({ name, value }: {
-                  inherit name;
-                  value = (evalComponent { inherit (module) inputs; } value).config;
-                }) (componentsFrom module.config.flake.components)
-              );
-
-              inherit (evalComponent { inherit (module) inputs; } nixology.core.components) config;
-            in
-            {
-              components = pkgs.runCommandLocal "checks" (builtins.mapAttrs (
-                _: config: builtins.seq config "ok"
-              ) configs) "touch $out";
-
-              nixology-core-components = pkgs.runCommandLocal "checks" {
-                check_flake_components = builtins.seq config.flake.components "ok";
-              } "touch $out";
-            };
-        };
+        flake.schemas = { inherit (config.flake.exportedSchemas) components; };
       };
     };
 in
-{
-  imports = [
-    implementation
+lib.mkComponent {
+  name = lib.basename __curPos.file;
+
+  modules = { inherit flake; };
+
+  dependencies = [
+    nixology.core.perSystem
+    nixology.core.schemas
   ];
 
-  flake.components = {
-    nixology.core.components = {
-      inherit implementation;
-
-      dependencies = [
-        nixology.core.perSystem
-        nixology.core.schemas
-      ];
-
-      meta = {
-        shortDescription = "reusable component system for modules";
-        description = ''
-          Provides a reusable component system for modules organized into a
-          structured domain.subdomain.name hierarchy with support for dependencies
-          and metadata.
-        '';
-      };
-    };
+  meta = {
+    shortDescription = "reusable component system for modules";
+    description = ''
+      Provides a reusable component system for modules organized into a
+      structured domain.subdomain.name hierarchy with support for dependencies
+      and metadata.
+    '';
   };
 }

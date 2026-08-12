@@ -1,48 +1,16 @@
-{ ... }@local:
+{ lib, inputs, ... }:
 let
-  inherit (local.inputs.self.components) nixology;
-
-  inherit (local.lib.components) evalComponent;
-
-  implementation =
-    { ... }@module:
-    {
-      imports = [
-        "${local.inputs.flake-parts}/modules/flake.nix"
-      ];
-
-      config = {
-        perSystem = { pkgs, ... }: {
-          checks =
-            let
-              inherit (evalComponent { inherit (module) inputs; } nixology.core.flake) config;
-            in
-            {
-              nixology-core-flake = pkgs.runCommandLocal "checks" {
-                check_flake = builtins.seq config.flake "ok";
-              } "touch $out";
-            };
-        };
-      };
-    };
+  flake = "${inputs.flake-parts}/modules/flake.nix";
 in
-{
-  imports = [
-    implementation
-  ];
+lib.mkComponent {
+  name = lib.basename __curPos.file;
 
-  flake.components = {
-    nixology.core.flake = {
-      inherit implementation;
+  modules = { inherit flake; };
 
-      dependencies = [
-        nixology.core.perSystem
-      ];
+  dependencies = with inputs.self.components; [ nixology.core.perSystem ];
 
-      meta = {
-        description = "Expose the upstream flake-parts flake module as a nixology component.";
-        shortDescription = "flake-parts flake component";
-      };
-    };
+  meta = {
+    description = "Expose the upstream flake-parts flake module as a nixology component.";
+    shortDescription = "flake-parts flake component";
   };
 }

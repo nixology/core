@@ -1,8 +1,13 @@
-{ ... }@local:
+{
+  config,
+  inputs,
+  lib,
+  ...
+}:
 let
-  inherit (local.inputs.self.components) nixology;
+  inherit (inputs.self.components) nixology;
 
-  extraInputs = local.config.partitions.systems.extraInputs;
+  extraInputs = config.partitions.systems.extraInputs;
 
   variants = [
     "default"
@@ -19,19 +24,15 @@ let
       implementation = {
         systems =
           if variant == "default" then
-            local.lib.mkOptionDefault (
-              local.lib.filter (x: x != "x86_64-darwin") (import extraInputs.${variant})
-            )
+            lib.mkOptionDefault (lib.filter (x: x != "x86_64-darwin") (import extraInputs.${variant}))
           else
-            local.lib.filter (x: x != "x86_64-darwin") (import extraInputs.${variant});
+            lib.filter (x: x != "x86_64-darwin") (import extraInputs.${variant});
       };
     in
     {
       inherit implementation;
 
-      dependencies = [
-        nixology.core.perSystem
-      ];
+      dependencies = [ nixology.core.perSystem ];
 
       meta = {
         description = "Configure the flake systems list using the `${variant}` systems input.";

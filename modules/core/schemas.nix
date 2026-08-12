@@ -1,62 +1,40 @@
-{ ... }@local:
-let
-  inherit (local.inputs.self.components) nixology;
-
-  inherit (local.lib) mkOption;
-
-  inherit (local.lib.components) evalComponent;
-
-  inherit (local.lib.types) anything lazyAttrsOf;
-
-  inherit (local.config.partitions.schemas.extraInputs) flake-schemas;
-
-  implementation =
-    { ... }@module:
-    {
-      options = {
-        flake.schemas = mkOption {
-          type = lazyAttrsOf (lazyAttrsOf anything);
-          default = { };
-          description = "Schemas for flake output types.";
-        };
-      };
-
-      config = {
-        flake.schemas = {
-          inherit (flake-schemas.exportedSchemas) schemas;
-        };
-
-        perSystem = { pkgs, ... }: {
-          checks =
-            let
-              inherit (evalComponent { inherit (module) inputs; } nixology.core.schemas) config;
-            in
-            {
-              nixology-core-schemas = pkgs.runCommandLocal "checks" {
-                check_flake_schemas_schemas = builtins.seq config.flake.schemas.schemas "ok";
-              } "touch $out";
-            };
-        };
-      };
-    };
-in
 {
-  imports = [
-    implementation
-  ];
+  config,
+  inputs,
+  lib,
+  ...
+}:
+let
+  inherit (lib) mkOption;
+  inherit (lib.types) anything lazyAttrsOf;
 
-  flake.components = {
-    nixology.core.schemas = {
-      inherit implementation;
+  inherit (config.partitions.schemas.extraInputs) flake-schemas;
 
-      dependencies = [
-        nixology.core.flake
-      ];
-
-      meta = {
-        description = "Flake schemas used by this flake.";
-        shortDescription = "flake schemas used by this flake";
+  flake = {
+    options = {
+      flake.schemas = mkOption {
+        type = lazyAttrsOf (lazyAttrsOf anything);
+        default = { };
+        description = "Schemas for flake output types.";
       };
     };
+
+    config = {
+      flake.schemas = {
+        inherit (flake-schemas.exportedSchemas) schemas;
+      };
+    };
+  };
+in
+lib.mkComponent {
+  name = lib.basename __curPos.file;
+
+  modules = { inherit flake; };
+
+  dependencies = with inputs.self.components; [ nixology.core.flake ];
+
+  meta = {
+    description = "Flake schemas used by this flake.";
+    shortDescription = "flake schemas used by this flake";
   };
 }

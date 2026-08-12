@@ -1,26 +1,17 @@
-{ ... }@local:
+{ inputs, lib, ... }:
 let
-  inherit (local.inputs.self.components) nixology;
-
-  implementation = local.inputs.flake-parts.flakeModules.touchup;
+  flake = inputs.flake-parts.flakeModules.touchup;
 in
-{
-  imports = [
-    implementation
-  ];
+lib.mkComponent {
+  name = lib.basename __curPos.file;
+  subdomain = "extra";
 
-  flake.components = {
-    nixology.extra.touchup = {
-      inherit implementation;
+  modules = { inherit flake; };
 
-      dependencies = [
-        nixology.core.flake
-      ];
+  dependencies = with inputs.self.components; [ nixology.core.flake ];
 
-      meta = {
-        description = "Controls which flake attributes appear in `processedFlake` and how they are transformed.";
-        shortDescription = "controls which flake attributes appear and how they are transformed";
-      };
-    };
+  meta = {
+    description = "Controls which flake attributes appear in `processedFlake` and how they are transformed.";
+    shortDescription = "controls which flake attributes appear and how they are transformed";
   };
 }

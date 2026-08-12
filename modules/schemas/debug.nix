@@ -1,14 +1,15 @@
-{ ... }@local:
+{
+  config,
+  inputs,
+  lib,
+  ...
+}:
 let
-  inherit (local.inputs.self.components) nixology;
+  inherit (config.partitions.schemas.extraInputs) flake-schemas;
+  inherit (flake-schemas.lib) mkChildren;
 
-  inherit (local.lib.components) evalComponent;
-
-  implementation =
-    { ... }@module:
+  flake =
     let
-      inherit (local.config.partitions.schemas.extraInputs.flake-schemas.lib) mkChildren;
-
       version = 1;
 
       mkSchema = doc: inventory: {
@@ -43,7 +44,7 @@ let
               (
                 configs:
                 mkChildren (
-                  builtins.mapAttrs (system: config: {
+                  builtins.mapAttrs (_system: _config: {
                     what = "flake-parts perSystem config";
                   }) configs
                 )
@@ -71,45 +72,23 @@ let
                 N.B. these are not part of the `config` parameter, but are merged in for
                 debugging convenience.
               ''
-              (config: {
+              (_config: {
                 what = "flake-parts top-level configuration";
               });
-        };
-
-        perSystem = { pkgs, ... }: {
-          checks =
-            let
-              inherit (evalComponent { inherit (module) inputs; } nixology.schemas.debug) config;
-            in
-            {
-              nixology-schemas-debug = pkgs.runCommandLocal "checks" {
-                check_flake_exportedSchemas_allSystems = builtins.seq config.flake.exportedSchemas.allSystems "ok";
-                check_flake_exportedSchemas_currentSystem = builtins.seq config.flake.exportedSchemas.currentSystem "ok";
-                check_flake_exportedSchemas_debug = builtins.seq config.flake.exportedSchemas.debug "ok";
-              } "touch $out";
-            };
-
         };
       };
     };
 in
-{
-  imports = [
-    implementation
-  ];
+lib.mkComponent {
+  name = lib.basename __curPos.file;
+  subdomain = "schemas";
 
-  flake.components = {
-    nixology.schemas.debug = {
-      inherit implementation;
+  modules = { inherit flake; };
 
-      dependencies = [
-        nixology.core.exportedSchemas
-      ];
+  dependencies = with inputs.self.components; [ nixology.core.exportedSchemas ];
 
-      meta = {
-        description = "Exported schemas for flake-parts debug attributes";
-        shortDescription = "exported schemas for flake-parts debug attributes";
-      };
-    };
+  meta = {
+    description = "Exported schemas for flake-parts debug attributes";
+    shortDescription = "exported schemas for flake-parts debug attributes";
   };
 }

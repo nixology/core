@@ -7,8 +7,6 @@ let
   inherit (local.inputs.self.components) nixology;
 
   inherit (lib)
-    all
-    assertMsg
     extend
     filter
     getAttrFromPath
@@ -16,10 +14,7 @@ let
     mkDefault
     optional
     optionals
-    setDefaultModuleLocation
     ;
-
-  inherit (lib.components) evalComponent;
 
   inherit (lib.filesystem)
     pathIsDirectory
@@ -39,7 +34,7 @@ let
   library =
     let
       flake-parts-lib = import "${local.inputs.flake-parts}/lib.nix" {
-        lib = extend (final: prev: library);
+        lib = extend (_final: _prev: library);
         builtinModules = { };
         extraModules = { };
       };
@@ -86,11 +81,7 @@ let
         }:
         let
           implementation =
-            {
-              config,
-              lib,
-              ...
-            }@args:
+            { config, ... }:
             let
               inherit (config) flakeref;
 
@@ -134,7 +125,7 @@ let
                   null
                 else
                   {
-                    flake.modules = builtins.mapAttrs (class: module: {
+                    flake.modules = builtins.mapAttrs (_class: module: {
                       ${componentName} = {
                         key = "${flakeref}#components.${componentName}";
                         imports = [ module ];
@@ -153,11 +144,7 @@ let
 
               flake.components.${componentDomain}.${componentSubdomain}.${componentName} = {
                 implementation = module;
-                dependencies = dependencies ++ [
-                  nixology.core.modules
-                  nixology.core.components
-                ];
-                inherit meta;
+                inherit dependencies meta;
               };
             };
         in
@@ -265,32 +252,26 @@ let
       };
     };
 
-  implementation =
-    { ... }@module:
-    {
-      flake.lib = mkDefault (makeExtensible (final: library));
-      flake.schemas = { inherit (local.config.flake.exportedSchemas) lib; };
+  implementation = {
+    flake.lib = mkDefault (makeExtensible (_final: library));
+    flake.schemas = { inherit (local.config.flake.exportedSchemas) lib; };
 
-      perSystem = { pkgs, ... }: {
-        checks =
-          let
-            inherit (evalComponent { inherit (module) inputs; } nixology.core.lib) config;
-          in
-          {
-            nixology-core-lib = pkgs.runCommandLocal "checks" {
-              check_flake_lib_mkFlake = builtins.seq local.lib.flake.mkFlake "ok";
-              check_flake_lib_metadataForFlakeInput = builtins.seq local.lib.flake.metadataForFlakeInput "ok";
-              check_flake_lib_metadataForFlakeInput_self_flake-parts =
-                (local.lib.flake.metadataForFlakeInput local.inputs.self local.inputs.flake-parts).pname;
-            } "touch $out";
-          };
-      };
-
-      touchup = {
-        # hide attributes added to lib when using makeExtensible
-        attr.lib.attr.__unfix__.enable = false;
+    perSystem = { pkgs, ... }: {
+      checks = {
+        nixology-core-lib = pkgs.runCommandLocal "checks" {
+          check_flake_lib_mkFlake = builtins.seq local.lib.flake.mkFlake "ok";
+          check_flake_lib_metadataForFlakeInput = builtins.seq local.lib.flake.metadataForFlakeInput "ok";
+          check_flake_lib_metadataForFlakeInput_self_flake-parts =
+            (local.lib.flake.metadataForFlakeInput local.inputs.self local.inputs.flake-parts).pname;
+        } "touch $out";
       };
     };
+
+    touchup = {
+      # hide attributes added to lib when using makeExtensible
+      attr.lib.attr.__unfix__.enable = false;
+    };
+  };
 in
 {
   imports = [

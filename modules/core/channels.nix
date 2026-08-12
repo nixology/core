@@ -25,9 +25,7 @@ let
         };
     };
 
-    dependencies = [
-      nixology.core.perSystem
-    ];
+    dependencies = [ nixology.core.perSystem ];
 
     meta = {
       shortDescription = "package set from ${variant} channel flake";

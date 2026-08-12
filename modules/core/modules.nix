@@ -1,17 +1,12 @@
-{ ... }@local:
+{ inputs, lib, ... }:
 let
-  inherit (local.inputs.self.components) nixology;
-
-  inherit (local.inputs) flake-parts;
-
-  implementation = {
+  flake = {
     imports = [
-      flake-parts.flakeModules.modules
+      inputs.flake-parts.flakeModules.modules
     ];
 
     config = {
       flake.schemas = {
-
         modules = {
           version = 1;
           doc = ''
@@ -21,24 +16,19 @@ let
             what = "modules for use by other module systems";
           };
         };
-
       };
     };
   };
 in
-{
-  flake.components = {
-    nixology.core.modules = {
-      inherit implementation;
+lib.mkComponent {
+  name = lib.basename __curPos.file;
 
-      dependencies = [
-        nixology.core.schemas
-      ];
+  modules = { inherit flake; };
 
-      meta = {
-        description = "Provide the `modules` flake output for modules usable by any module system.";
-        shortDescription = "generic modules";
-      };
-    };
+  dependencies = with inputs.self.components; [ nixology.core.schemas ];
+
+  meta = {
+    description = "Provide the `modules` flake output for modules usable by any module system.";
+    shortDescription = "generic modules";
   };
 }
