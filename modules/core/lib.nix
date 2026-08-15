@@ -70,6 +70,7 @@ let
           name,
           modules ? { },
           dependencies ? [ ],
+          partition ? null,
           domain ? null,
           subdomain ? null,
           meta ? { },
@@ -113,6 +114,7 @@ let
                   abort "Unable to determine component subdomain.";
 
               featureModule = modules.flake or null;
+
               targetModules = removeAttrs modules [ "flake" ];
 
               featureTargetsModule =
@@ -120,13 +122,37 @@ let
                   null
                 else
                   {
-                    flake.modules = builtins.mapAttrs (_class: module: {
+                    flake.modules = builtins.mapAttrs (class: module: {
                       ${componentName} = {
-                        key = "${flakeref}#components.${componentName}";
+                        #
+                        # NOTE: merge semanatics for deferredModule may file here
+                        # because of 'key'. May need to see if key is same, then
+                        # some how merge the imports??
+                        #
+                        # NOTE: maybe we should not key modules? Treat modules as
+                        # an implementation detail, and use touchup to remove modules
+                        # from the flake output.
+                        #
+                        key = "${flakeref}#modules.${class}.${componentName}";
                         imports = [ module ];
                       };
                     }) targetModules;
                   };
+
+              featureImport =
+                assert partition == null || builtins.isString partition;
+                if featureModule == null then
+                  null
+                else if builtins.isString partition then
+                  { partitions.${partition}.module = featureModule; }
+                else
+                  featureModule;
+
+              dogfoodModule = {
+                imports =
+                  optional (featureImport != null) featureImport
+                  ++ optional (featureTargetsModule != null) featureTargetsModule;
+              };
 
               module = {
                 imports =
@@ -145,7 +171,7 @@ let
                 ];
             in
             {
-              imports = [ module ];
+              imports = [ dogfoodModule ];
 
               flake.components.${componentDomain}.${componentSubdomain}.${componentName} = {
                 inherit module meta;
