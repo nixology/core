@@ -1,12 +1,9 @@
 { lib, inputs, ... }:
 let
-  inherit (lib) mkOption;
-  inherit (lib.types) listOf str;
-
   flake = args: {
     options = {
-      moduleClasses = mkOption {
-        type = listOf str;
+      moduleClasses = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
         default = [
           "flake"
           "homeManager"

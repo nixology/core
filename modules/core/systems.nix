@@ -21,16 +21,16 @@ let
   mkSystemsComponent =
     variant:
     let
-      implementation = {
+      module = {
         systems =
-          if variant == "default" then
-            lib.mkOptionDefault (lib.filter (x: x != "x86_64-darwin") (import extraInputs.${variant}))
-          else
-            lib.filter (x: x != "x86_64-darwin") (import extraInputs.${variant});
+          let
+            filteredSystems = lib.remove "x86_64-darwin" (import extraInputs.${variant});
+          in
+          if variant == "default" then lib.mkOptionDefault filteredSystems else filteredSystems;
       };
     in
     {
-      inherit implementation;
+      inherit module;
 
       dependencies = [ nixology.core.perSystem ];
 
@@ -49,7 +49,7 @@ let
 in
 {
   imports = [
-    components.default.implementation
+    components.default.module
   ];
 
   flake.components = {

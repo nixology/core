@@ -5,15 +5,12 @@
   ...
 }:
 let
-  inherit (lib) mkOption;
-  inherit (lib.types) anything lazyAttrsOf;
-
   inherit (config.partitions.schemas.extraInputs) flake-schemas;
 
   flake = {
     options = {
-      flake.schemas = mkOption {
-        type = lazyAttrsOf (lazyAttrsOf anything);
+      flake.schemas = lib.mkOption {
+        type = lib.types.lazyAttrsOf (lib.types.lazyAttrsOf lib.types.anything);
         default = { };
         description = "Schemas for flake output types.";
       };

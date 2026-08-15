@@ -52,14 +52,9 @@ let
         in
         head parts;
 
-      uses =
-        {
-          components ? [ ],
-          ...
-        }:
-        {
-          imports = map (component: component.module) components;
-        };
+      implementationOf = component: component.implementation;
+
+      implementationsOf = map implementationOf;
 
       modulesIn =
         directory:
@@ -68,7 +63,7 @@ let
         else
           [ ];
 
-      evalComponent = args: component: evalFlakeModule args component.module;
+      evalComponent = args: component: evalFlakeModule args component.implementation;
 
       mkComponent =
         {
@@ -133,25 +128,27 @@ let
                     }) targetModules;
                   };
 
-              implementation = {
+              module = {
                 imports =
                   optional (featureModule != null) featureModule
                   ++ optional (featureTargetsModule != null) featureTargetsModule;
               };
 
-              componentDependencies = let
-                coreref = (import "${local.inputs.self}/modules/flakeref.nix").flakeref;
-              in
-                dependencies ++ lib.optionals (flakeref != coreref) [
+              componentDependencies =
+                let
+                  coreref = (import "${local.inputs.self}/modules/flakeref.nix").flakeref;
+                in
+                dependencies
+                ++ lib.optionals (flakeref != coreref) [
                   nixology.core.components
                   nixology.core.modules
                 ];
             in
             {
-              imports = [ implementation ];
+              imports = [ module ];
 
               flake.components.${componentDomain}.${componentSubdomain}.${componentName} = {
-                inherit implementation meta;
+                inherit module meta;
                 dependencies = componentDependencies;
               };
             };
@@ -163,7 +160,7 @@ let
       mkFlake =
         args: module:
         flake-parts-lib.mkFlake args {
-          imports = [ module ] ++ optionals (config != null) [ nixology.core.default.module ];
+          imports = [ module ] ++ optionals (config != null) [ nixology.core.default.implementation ];
         };
 
       mkTOMLFlake =
@@ -239,7 +236,8 @@ let
         inherit
           evalComponent
           mkComponent
-          uses
+          implementationOf
+          implementationsOf
           ;
       };
       flake = {
@@ -260,7 +258,7 @@ let
       };
     };
 
-  implementation = {
+  module = {
     flake.lib = mkDefault (makeExtensible (_final: library));
     flake.schemas = { inherit (local.config.flake.exportedSchemas) lib; };
 
@@ -283,7 +281,7 @@ let
 in
 {
   imports = [
-    implementation
+    module
   ];
 
   # provide `flake.lib` attribute for core bootstrap import
@@ -293,7 +291,7 @@ in
 
   flake.components = {
     nixology.core.lib = {
-      inherit implementation;
+      inherit module;
 
       dependencies = [
         nixology.core.perSystem

@@ -5,11 +5,6 @@
   ...
 }:
 let
-  inherit (lib)
-    isAttrs
-    mapAttrs
-    ;
-
   inherit (config.partitions.schemas.extraInputs) flake-schemas;
   inherit (flake-schemas.lib) mkChildren;
 
@@ -26,9 +21,9 @@ let
               recurse =
                 components:
                 mkChildren (
-                  mapAttrs (
+                  lib.mapAttrs (
                     _name: value:
-                    if isAttrs value && value ? module then
+                    if lib.isAttrs value && value ? implementation then
                       {
                         what =
                           if value.meta.shortDescription != null then

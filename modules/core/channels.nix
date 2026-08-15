@@ -1,9 +1,10 @@
-{ ... }@local:
+{
+  config,
+  inputs,
+  lib,
+  ...
+}:
 let
-  inherit (local.inputs.self.components) nixology;
-
-  inherit (local.lib) genAttrs;
-
   variants = [
     "nixos"
     "nixos-small"
@@ -14,18 +15,18 @@ let
   ];
 
   mkChannelComponent = variant: {
-    implementation = {
+    module = {
       perSystem =
         { system, ... }:
         let
-          nixpkgs = local.config.partitions.channels.extraInputs.${variant}.inputs.channel;
+          nixpkgs = config.partitions.channels.extraInputs.${variant}.inputs.channel;
         in
         {
           _module.args.pkgs = nixpkgs.legacyPackages.${system};
         };
     };
 
-    dependencies = [ nixology.core.perSystem ];
+    dependencies = with inputs.self.components; [ nixology.core.perSystem ];
 
     meta = {
       shortDescription = "package set from ${variant} channel flake";
@@ -39,6 +40,6 @@ let
 in
 {
   flake.components = {
-    nixology.channels = genAttrs variants mkChannelComponent;
+    nixology.channels = lib.genAttrs variants mkChannelComponent;
   };
 }

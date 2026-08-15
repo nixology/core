@@ -1,8 +1,7 @@
-{ ... }@local:
+{ config, inputs, ... }:
 let
-  inherit (local.inputs) flake-parts;
-
-  inherit (local.config.partitions.schemas.extraInputs) flake-schemas;
+  inherit (inputs) flake-parts;
+  inherit (config.partitions.schemas.extraInputs) flake-schemas;
 
   module = {
     imports = [

@@ -1,12 +1,9 @@
 { lib, ... }:
 let
-  inherit (lib) mkOption;
-  inherit (lib.types) nullOr str;
-
   flake = {
     options = {
-      flakeref = mkOption {
-        type = nullOr str;
+      flakeref = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
         default = null;
         description = "The flake reference for this flake.";
       };

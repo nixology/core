@@ -7,8 +7,6 @@
 let
   inherit (config) flakeref;
 
-  inherit (inputs.self.components) nixology;
-
   inherit (lib)
     isAttrs
     mkDefault
@@ -44,7 +42,7 @@ let
           - Define the value only once, with a single definition in a single module
       '';
 
-      isComponent = value: isAttrs value && value ? module && value.module != null;
+      isComponent = value: isAttrs value && value ? implementation && value.implementation != null;
 
       componentRefType = addCheck raw isComponent;
 
@@ -99,12 +97,12 @@ let
                 description = "Metadata about the component.";
               };
 
-              implementation = mkOption {
+              module = mkOption {
                 type = deferredModule;
                 description = "The module defining this component.";
               };
 
-              module = mkOption {
+              implementation = mkOption {
                 type = deferredModule;
                 readOnly = true;
                 description = "The fully resolved component module including dependencies.";
@@ -121,9 +119,9 @@ let
                         + optionalString (config.meta.version != null) ".${config.meta.version}";
 
                       imports = [
-                        config.implementation
+                        config.module
                       ]
-                      ++ map (dependency: dependency.module) config.dependencies;
+                      ++ map (dependency: dependency.implementation) config.dependencies;
 
                       _class = "flake";
                       _file = "${moduleLocation}#components.${domain}.${subdomain}.${config.meta.name}";
@@ -198,6 +196,7 @@ let
       config = {
         perSystem = { pkgs, ... }: {
           checks =
+            with inputs.self.components;
             let
               configs = builtins.listToAttrs (
                 map ({ name, value }: {
@@ -228,7 +227,7 @@ lib.mkComponent {
 
   modules = { inherit flake; };
 
-  dependencies = [
+  dependencies = with inputs.self.components; [
     nixology.core.perSystem
     nixology.core.schemas
   ];

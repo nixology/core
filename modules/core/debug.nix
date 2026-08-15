@@ -5,15 +5,13 @@
   ...
 }:
 let
-  inherit (lib) mkDefault;
-
   flake = {
     imports = [
       "${inputs.flake-parts}/modules/debug.nix"
     ];
 
     config = {
-      debug = mkDefault true;
+      debug = lib.mkDefault true;
       flake.schemas = { inherit (config.flake.exportedSchemas) allSystems currentSystem debug; };
     };
   };
