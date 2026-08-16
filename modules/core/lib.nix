@@ -52,9 +52,9 @@ let
         in
         head parts;
 
-      implementationOf = component: component.implementation;
+      implementationFrom = component: component.implementation;
 
-      implementationsOf = map implementationOf;
+      implementationsFrom = map implementationFrom;
 
       modulesIn =
         directory:
@@ -254,8 +254,8 @@ let
         inherit
           evalComponent
           mkComponent
-          implementationOf
-          implementationsOf
+          implementationFrom
+          implementationsFrom
           ;
       };
       flake = {
