@@ -70,20 +70,20 @@ let
           name,
           modules ? { },
           dependencies ? [ ],
-          partition ? null,
+          dogfoodPartition ? null,
           domain ? null,
           subdomain ? null,
           meta ? { },
         }:
         let
-          component =
+          componentRegistrationModule =
             { config, ... }:
             let
               inherit (config) flakeref;
 
               componentName = basename name;
 
-              flakerefComponents =
+              parsedFlakeref =
                 let
                   match = builtins.match "([a-zA-Z0-9+.-]+):([^/]+)/([^/?#]+)(/([^?#]+))?(\\?.*)?" flakeref;
                 in
@@ -97,75 +97,66 @@ let
                     ref = builtins.elemAt match 4;
                   };
 
-              componentDomain =
+              resolvedDomain =
                 if domain != null then
                   domain
-                else if flakerefComponents != null then
-                  flakerefComponents.owner
+                else if parsedFlakeref != null then
+                  parsedFlakeref.owner
                 else
                   abort "Unable to determine component domain.";
 
-              componentSubdomain =
+              resolvedSubdomain =
                 if subdomain != null then
                   subdomain
-                else if flakerefComponents != null then
-                  basename flakerefComponents.repo
+                else if parsedFlakeref != null then
+                  basename parsedFlakeref.repo
                 else
                   abort "Unable to determine component subdomain.";
 
-              featureModule = modules.flake or null;
+              flakeModule = modules.flake or null;
 
-              targetModules = removeAttrs modules [ "flake" ];
+              classModules = removeAttrs modules [ "flake" ];
 
-              featureTargetsModule =
-                if builtins.attrNames targetModules == [ ] then
+              modulesModule =
+                if builtins.attrNames classModules == [ ] then
                   null
                 else
                   {
                     flake.modules = builtins.mapAttrs (class: module: {
                       ${componentName} = {
-                        #
-                        # NOTE: merge semanatics for deferredModule may file here
-                        # because of 'key'. May need to see if key is same, then
-                        # some how merge the imports??
-                        #
-                        # NOTE: maybe we should not key modules? Treat modules as
-                        # an implementation detail, and use touchup to remove modules
-                        # from the flake output.
-                        #
                         key = "${flakeref}#modules.${class}.${componentName}";
                         imports = [ module ];
                       };
-                    }) targetModules;
+                    }) classModules;
                   };
 
-              featureImport =
-                assert partition == null || builtins.isString partition;
-                if featureModule == null then
+              dogfoodFlakeModule =
+                assert dogfoodPartition == null || builtins.isString dogfoodPartition;
+                if flakeModule == null then
                   null
-                else if builtins.isString partition then
-                  { partitions.${partition}.module = featureModule; }
+                else if dogfoodPartition == null then
+                  flakeModule
                 else
-                  featureModule;
+                  { partitions.${dogfoodPartition}.module = flakeModule; };
 
               dogfoodModule = {
                 imports =
-                  optional (featureImport != null) featureImport
-                  ++ optional (featureTargetsModule != null) featureTargetsModule;
+                  optional (dogfoodFlakeModule != null) dogfoodFlakeModule
+                  ++ optional (modulesModule != null) modulesModule;
               };
 
-              module = {
+              componentModule = {
                 imports =
-                  optional (featureModule != null) featureModule
-                  ++ optional (featureTargetsModule != null) featureTargetsModule;
+                  optional (flakeModule != null) flakeModule
+                  ++ optional (modulesModule != null) modulesModule;
               };
 
-              componentDependencies =
+              resolvedDependencies =
                 let
-                  coreref = (import "${local.inputs.self}/modules/flakeref.nix").flakeref;
+                  coreFlakeref = (import "${local.inputs.self}/modules/flakeref.nix").flakeref;
                 in
                 dependencies
-                ++ lib.optionals (flakeref != coreref) [
+                ++ lib.optionals (flakeref != coreFlakeref) [
                   nixology.core.components
                   nixology.core.modules
                 ];
@@ -173,14 +164,15 @@ let
             {
               imports = [ dogfoodModule ];
 
-              flake.components.${componentDomain}.${componentSubdomain}.${componentName} = {
-                inherit module meta;
-                dependencies = componentDependencies;
+              flake.components.${resolvedDomain}.${resolvedSubdomain}.${componentName} = {
+                module = componentModule;
+                dependencies = resolvedDependencies;
+                inherit meta;
               };
             };
         in
         {
-          imports = [ component ];
+          imports = [ componentRegistrationModule ];
         };
 
       mkFlake =
